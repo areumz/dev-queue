@@ -2,6 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <body>
+<div>
+    <a th:href="@{/articles}">전체</a>
+    <a th:href="@{/articles(category='DEV_DOC')}">개발문서</a>
+    <a th:href="@{/articles(category='AI')}">AI</a>
+    <a th:href="@{/articles(category='JOB')}">채용정보</a>
+    <a th:href="@{/articles(category='ETC')}">기타</a>
+</div>
 
 <ul>
     <li th:each="article: ${articles}" >
