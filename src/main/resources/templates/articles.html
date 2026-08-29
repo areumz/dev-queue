@@ -4,7 +4,9 @@
 <body>
 
 <ul>
-    <li th:each="article: ${articles}" th:text="${article}"></li>
+    <li th:each="article: ${articles}" >
+        <a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}"></a>
+    </li>
 </ul>
 </body>
 </html>

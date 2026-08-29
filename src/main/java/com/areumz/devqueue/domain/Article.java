@@ -47,4 +47,14 @@ public class Article {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void changeMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public void toggleRead() {
+        this.read = !this.read;
+    }
+
+
 }
