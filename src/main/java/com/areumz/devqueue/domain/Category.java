@@ -1,4 +1,5 @@
 package com.areumz.devqueue.domain;
 
-public class Category {
+public enum Category {
+    DEV_DOC, AI, JOB, ETC
 }
