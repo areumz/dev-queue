@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<form action="/articles/new" method="post">
+    <input type="text" name="title" placeholder="제목">
+    <input type="text" name="url" placeholder="URL">
+    <select name="category">
+        <option value="DEV_DOC">개발문서</option>
+        <option value="AI">AI</option>
+        <option value="JOB">채용정보</option>
+        <option value="ETC">기타</option>
+    </select>
+    <textarea name="memo" placeholder="메모"></textarea>
+    <button type="submit">저장</button>
+</form>
+
+</body>
+</html>
