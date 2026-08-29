@@ -21,4 +21,18 @@ public class ArticleService {
     public List<Article> findArticles() {
         return articleRepository.findAll();
     }
+
+    public Article findOne(Long id) {
+        return articleRepository.findById(id).orElseThrow();
+    }
+
+    public void updateMemo(Long id, String memo) {
+        Article article = articleRepository.findById(id).orElseThrow();
+        article.changeMemo(memo);
+    }
+
+    public void toggleRead(Long id) {
+        Article article = articleRepository.findById(id).orElseThrow();
+        article.toggleRead();
+    }
 }
