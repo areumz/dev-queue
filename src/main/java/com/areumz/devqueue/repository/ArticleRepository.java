@@ -1,4 +1,6 @@
-package com.areumz.devqueue.domain;
+package com.areumz.devqueue.repository;
+
+import com.areumz.devqueue.domain.Article;
 
 import java.util.List;
 import java.util.Optional;
