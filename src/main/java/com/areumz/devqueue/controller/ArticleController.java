@@ -22,8 +22,13 @@ public class ArticleController {
     }
 
     @GetMapping("/articles")
-    public String list(Model model) {
-        List<Article> articles = articleService.findArticles();
+    public String list(@RequestParam(required = false) Category category, Model model) {
+        List<Article> articles;
+        if(category == null){
+            articles = articleService.findArticles();
+        } else {
+            articles = articleService.findByCategory(category);
+        }
         model.addAttribute("articles", articles);
         return "articles";
     }
