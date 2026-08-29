@@ -42,4 +42,11 @@ public class ArticleService {
                 .filter(article -> article.getCategory() == category)
                 .toList();
     }
+
+    public List<Article> findMyArticles(Long userId, Category category) {
+        return articleRepository.findAll().stream()
+                .filter(article->article.getUserId().equals(userId))
+                .filter(article->category==null || article.getCategory() == category )
+                .toList();
+    }
 }
