@@ -3,6 +3,7 @@ package com.areumz.devqueue.controller;
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.domain.User;
+import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.service.ArticleService;
 import com.areumz.devqueue.service.VocabularyService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -35,6 +37,17 @@ public class ArticleController {
 
         List<Article> articles = articleService.findMyArticles(loginUser.getId(), category);
         model.addAttribute("articles", articles);
+
+        LocalDate today = LocalDate.now();
+
+        if(!today.equals(loginUser.getLastPopupDate())) {
+            List<Vocabulary> popupWords = vocabularyService.getRandomUnmemorized(loginUser.getId());
+
+            if(!popupWords.isEmpty()) {
+                model.addAttribute("popupWords", popupWords);
+                loginUser.updatePopupDate(today);
+            }
+        }
         return "articles";
     }
 
@@ -84,23 +97,32 @@ public class ArticleController {
         return "redirect:/articles/" + id;
     }
 
-    @PostMapping("articles/{id}/vocabularies")
+    @PostMapping("/articles/{id}/vocabularies")
     public String addVocabulary(@PathVariable Long id, @RequestParam String word,
                                 @RequestParam String meaning) {
         vocabularyService.addVocabulary(word, meaning, id);
         return "redirect:/articles/" + id;
     }
 
-    @PostMapping("vocabularies/{id}/toggle")
+    @PostMapping("/vocabularies/{id}/toggle")
     public String toggleVocabulary(@PathVariable Long id, @RequestParam Long articleId) {
         vocabularyService.toggleMemorized(id);
         return "redirect:/articles/" + articleId;
     }
 
-    @PostMapping("vocabularies/{id}/delete")
+    @PostMapping("/vocabularies/{id}/delete")
     public String deleteVocabulary(@PathVariable Long id, @RequestParam Long articleId) {
         vocabularyService.deleteVocabulary(id);
         return "redirect:/articles/" + articleId;
     }
 
+    @PostMapping("/vocabularies/memorize")
+    public String memorize(@RequestParam(required = false) List<Long> ids) {
+        if(ids != null) {
+            for(Long id : ids) {
+                vocabularyService.toggleMemorized(id);
+            }
+        }
+        return "redirect:/articles";
+    }
 }
