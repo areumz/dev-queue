@@ -12,6 +12,29 @@
     <button type="submit">메모 저장</button>
 </form>
 
+<h3>모르는 단어</h3>
+
+<form th:action="@{/articles/{id}/vocabularies(id=${article.id})}" method="post">
+    <input type="text" name="word" placeholder="단어">
+    <input type="text" name="meaning" placeholder="뜻">
+    <button type="submit">단어 추가</button>
+</form>
+
+<ul>
+    <li th:each="vocab : ${vocabularies}">
+        <span th:text="${vocab.word}"></span> -
+        <span th:text="${vocab.meaning}"></span>
+        <form th:action="@{/vocabularies/{id}/toggle(id=${vocab.id})}" method="post" style="display:inline;">
+            <input type="hidden" name="articleId" th:value="${article.id}">
+            <button type="submit" th:text="${vocab.memorized} ? '암기완료' : '암기중'"></button>
+        </form>
+        <form th:action="@{/vocabularies/{id}/delete(id=${vocab.id})}" method="post" style="display:inline;">
+            <input type="hidden" name="articleId" th:value="${article.id}">
+            <button type="submit">삭제</button>
+        </form>
+    </li>
+</ul>
+
 <form th:action="@{/articles/{id}/read(id=${article.id})}" method="post">
     <button type="submit" th:text="${article.read} ? '읽음' : '안읽음'"></button>
 </form>
