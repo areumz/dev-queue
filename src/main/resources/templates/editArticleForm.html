@@ -11,32 +11,28 @@
 
 <div class="container">
     <div style="display:flex; align-items:center; gap:8px; margin-bottom:1.25rem;">
-        <a th:href="@{/articles}" style="color:#555; text-decoration:none;">←</a>
-        <h3 style="margin:0;">새 링크 추가</h3>
+        <a th:href="@{/articles/{id}(id=${article.id})}" style="color:#555; text-decoration:none;">←</a>
+        <h3 style="margin:0;">링크 수정</h3>
     </div>
 
     <div class="card">
-        <form th:action="@{/articles/new}" method="post">
+        <form th:action="@{/articles/{id}/edit(id=${article.id})}" method="post">
             <div style="margin-bottom:12px;">
                 <label style="font-size:13px; color:#888; display:block; margin-bottom:6px;">제목</label>
-                <input type="text" name="title" placeholder="소프트웨어 관련 56가지 원칙">
+                <input type="text" name="title" th:value="${article.title}">
             </div>
             <div style="margin-bottom:12px;">
                 <label style="font-size:13px; color:#888; display:block; margin-bottom:6px;">URL</label>
-                <input type="text" name="url" placeholder="https://lawsofsoftwareengineering.com">
+                <input type="text" name="url" th:value="${article.url}">
             </div>
             <div style="margin-bottom:14px;">
                 <label style="font-size:13px; color:#888; display:block; margin-bottom:6px;">카테고리</label>
                 <select name="category">
-                    <option value="DEV_DOC">개발문서</option>
-                    <option value="AI">AI</option>
-                    <option value="JOB">채용정보</option>
-                    <option value="ETC">기타</option>
+                    <option value="DEV_DOC" th:selected="${article.category.name() == 'DEV_DOC'}">개발문서</option>
+                    <option value="AI" th:selected="${article.category.name() == 'AI'}">AI</option>
+                    <option value="JOB" th:selected="${article.category.name() == 'JOB'}">채용정보</option>
+                    <option value="ETC" th:selected="${article.category.name() == 'ETC'}">기타</option>
                 </select>
-            </div>
-            <div style="margin-bottom:14px;">
-                <label style="font-size:13px; color:#888; display:block; margin-bottom:6px;">메모 <span style="color:#aaa;">(선택)</span></label>
-                <textarea name="memo" placeholder="간단한 메모를 남겨보세요" style="min-height:80px;"></textarea>
             </div>
             <button type="submit" class="btn-primary" style="width:100%;">저장</button>
         </form>

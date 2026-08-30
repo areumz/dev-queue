@@ -1,33 +1,71 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
 <body>
-<div th:if="${popupWords != null}" style="border:1px solid black; padding:10px;">
-    <h3>오늘의 단어</h3>
-    <form th:action="@{/vocabularies/memorize}" method="post">
-        <div th:each="word : ${popupWords}">
-            <input type="checkbox" name="ids" th:value="${word.id}">
-            <span th:text="${word.word}"></span> -
-            <span th:text="${word.meaning}"></span>
+
+<div class="header">
+    <div style="display:flex; align-items:center; gap:8px;">
+        <a th:href="@{/articles}" class="brand" style="font-size:28px; text-decoration:none; color:inherit;">DevQueue</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:14px; color:#555;" th:text="${loginUser.nickname} + '님'"></span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-secondary" style="padding:6px 14px; font-size:13px;">로그아웃</button>
+        </form>
+    </div>
+</div>
+
+<div class="container-wide">
+    <div th:if="${popupWords != null}" 
+    style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:100;">
+   
+   <div class="card" style="width:320px; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
+       <p style="font-size:13px; color:#888; margin-bottom:4px;">오늘의 단어</p>
+       <h3 style="margin-bottom:16px;">아직 못 외운 단어예요</h3>
+
+       <form th:action="@{/vocabularies/memorize}" method="post">
+           <div th:each="word : ${popupWords}" style="display:flex; justify-content:space-between; align-items:center; background:#F7F8F5; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
+               <div>
+                   <span style="font-weight:500;" th:text="${word.word}"></span> - 
+                   <span style="color:#888;" th:text="${word.meaning}"></span>
+               </div>
+               <input type="checkbox" name="ids" th:value="${word.id}"
+               onchange="this.parentElement.querySelector('span').style.textDecoration = this.checked ? 'line-through' : 'none';">
+           </div>
+           <button type="submit" class="btn-primary" style="width:100%; margin-top:8px;">확인, 오늘도 시작!</button>
+       </form>
+   </div>
+
+</div>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem;">
+        <div>
+            <h2 style="margin-bottom:4px;">읽을거리</h2>
+            <p style="font-size:14px; color:#888;">놓치지 않고 쌓아둔 개발 문서와 영상</p>
         </div>
-        <button type="submit">확인, 오늘도 시작!</button>
-    </form>
+        <a th:href="@{/articles/new}" class="btn-primary" style="text-decoration:none;">+ 새 링크</a>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:1.25rem;">
+        <a th:href="@{/articles}" class="pill" th:classappend="${category == null} ? 'active' : ''">전체</a>
+        <a th:href="@{/articles(category='DEV_DOC')}" class="pill" th:classappend="${category != null and category.name() == 'DEV_DOC'} ? 'active' : ''">개발문서</a>
+        <a th:href="@{/articles(category='AI')}" class="pill" th:classappend="${category != null and category.name() == 'AI'} ? 'active' : ''">AI</a>
+        <a th:href="@{/articles(category='JOB')}" class="pill" th:classappend="${category != null and category.name() == 'JOB'} ? 'active' : ''">채용정보</a>
+        <a th:href="@{/articles(category='ETC')}" class="pill" th:classappend="${category != null and category.name() == 'ETC'} ? 'active' : ''">기타</a>
+    </div>
+
+    <div th:each="article: ${articles}" class="card" style="display:flex; align-items:center; gap:14px;">
+        <div th:style="'width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:' + ${article.category.bgColor}">
+            <i th:class="'ti ' + ${article.category.icon}" th:style="'font-size:20px;color:' + ${article.category.color}"></i>
+        </div>
+        <a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}" 
+        th:style="${article.read} ? 'text-decoration:line-through;color:#999;' : 'text-decoration:none;color:inherit;'"></a>
+    </div>
+
 </div>
 
-<a th:href="@{/articles/new}">+ 문서 추가</a>
-
-<div>
-    <a th:href="@{/articles}">전체</a>
-    <a th:href="@{/articles(category='DEV_DOC')}">개발문서</a>
-    <a th:href="@{/articles(category='AI')}">AI</a>
-    <a th:href="@{/articles(category='JOB')}">채용정보</a>
-    <a th:href="@{/articles(category='ETC')}">기타</a>
-</div>
-
-<ul>
-    <li th:each="article: ${articles}" >
-        <a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}"></a>
-    </li>
-</ul>
 </body>
 </html>

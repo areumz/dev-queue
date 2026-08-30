@@ -1,42 +1,90 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
 <body>
 
-<h2 th:text="${article.title}"></h2>
-<p><a th:href="${article.url}" th:text="${article.url}"></a></p>
-<p th:text="${article.category}"></p>
-<p th:text="${article.memo}"></p>
+<div class="header">
+    <a th:href="@{/articles}" class="brand" style="font-size:28px; text-decoration:none; color:inherit;">DevQueue</a>
+</div>
 
-<form th:action="@{/articles/{id}/memo(id=${article.id})}" method="post">
-    <textarea name="memo" th:text="${article.memo}"></textarea>
-    <button type="submit">메모 저장</button>
-</form>
+<div class="container-wide">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:1.25rem;">
+        <a th:href="@{/articles}" style="color:#555; text-decoration:none;">←</a>
+        <h3 style="margin:0;">목록으로</h3>
+    </div>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+            <span class="badge" th:text="${article.category.label}"></span>
+            <div style="display:flex; gap:6px;">
+                <a th:href="@{/articles/{id}/edit(id=${article.id})}" class="btn-secondary" style="padding:4px 10px; font-size:12px; text-decoration:none;">수정</a>
+                <form th:action="@{/articles/{id}/delete(id=${article.id})}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit" class="btn-danger" style="padding:4px 10px; font-size:12px;">삭제</button>
+                </form>
+            </div>
+        </div>
 
-<h3>모르는 단어</h3>
+        <h3 style="margin-bottom:4px;" th:text="${article.title}"></h3>
+        <a th:href="${article.url}" th:text="${article.url}" style="font-size:13px; color:#3B6D11;"></a>
 
-<form th:action="@{/articles/{id}/vocabularies(id=${article.id})}" method="post">
-    <input type="text" name="word" placeholder="단어">
-    <input type="text" name="meaning" placeholder="뜻">
-    <button type="submit">단어 추가</button>
-</form>
+        <div style="border-top:0.5px solid #eee; margin:16px 0; padding-top:16px;">
+            <p style="font-size:13px; color:#888; margin-bottom:10px;">메모</p>
+        
+            <div id="memoView">
+                <p th:text="${article.memo}" style="margin-bottom:12px; line-height:1.6;"></p>
+                <button onclick="document.getElementById('memoView').style.display='none'; document.getElementById('memoEdit').style.display='block';" class="btn-tint">수정</button>
+            </div>
+        
+            <div id="memoEdit" style="display:none;">
+                <form th:action="@{/articles/{id}/memo(id=${article.id})}" method="post">
+                    <textarea name="memo" th:text="${article.memo}" style="min-height:80px; margin-bottom:14px;"></textarea>
+                    <button type="submit" class="btn-primary">저장</button>
+                </form>
+            </div>
+        </div>
 
-<ul>
-    <li th:each="vocab : ${vocabularies}">
-        <span th:text="${vocab.word}"></span> -
-        <span th:text="${vocab.meaning}"></span>
-        <form th:action="@{/vocabularies/{id}/toggle(id=${vocab.id})}" method="post" style="display:inline;">
-            <input type="hidden" name="articleId" th:value="${article.id}">
-            <button type="submit" th:text="${vocab.memorized} ? '암기완료' : '암기중'"></button>
-        </form>
-        <form th:action="@{/vocabularies/{id}/delete(id=${vocab.id})}" method="post" style="display:inline;">
-            <input type="hidden" name="articleId" th:value="${article.id}">
-            <button type="submit">삭제</button>
-        </form>
-    </li>
-</ul>
+        <div style="border-top:0.5px solid #eee; padding-top:16px; margin-bottom:16px;">
+            <form th:action="@{/articles/{id}/read(id=${article.id})}" method="post">
+                <button type="submit" 
+                th:class="${article.read} ? 'btn-secondary' : 'btn-tint'" 
+                th:text="${article.read} ? '읽음' : '안읽음'"></button>
+            </form>
+        </div>
 
-<form th:action="@{/articles/{id}/read(id=${article.id})}" method="post">
-    <button type="submit" th:text="${article.read} ? '읽음' : '안읽음'"></button>
-</form>
+        <div style="border-top:0.5px solid #eee; padding-top:16px;">
+            <p style="font-size:13px; color:#888; margin-bottom:10px;">모르는 단어</p>
+
+            <form th:action="@{/articles/{id}/vocabularies(id=${article.id})}" method="post" style="display:flex; gap:8px; margin-bottom:12px;">
+                <input type="text" name="word" placeholder="단어" style="flex:1;">
+                <input type="text" name="meaning" placeholder="뜻" style="flex:1;">
+                <button type="submit" class="btn-primary">추가</button>
+            </form>
+
+            <div th:each="vocab : ${vocabularies}" style="display:flex; justify-content:space-between; align-items:center; background:#F7F8F5; border-radius:10px; padding:8px 12px; margin-bottom:6px;">
+                <div>
+                    <span style="font-weight:500; font-size:13px;" th:text="${vocab.word}"></span>
+                    <span style="font-size:12px; color:#888; margin-left:8px;" th:text="${vocab.meaning}"></span>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <form th:action="@{/vocabularies/{id}/toggle(id=${vocab.id})}" method="post" style="display:inline;">
+                        <input type="hidden" name="articleId" th:value="${article.id}">
+                        <button type="submit" 
+                        th:class="${vocab.memorized} ? 'btn-secondary' : 'btn-tint'"
+                        style="padding:4px 10px; font-size:12px;" 
+                        th:text="${vocab.memorized} ? '암기완료' : '암기중'"></button>
+                    </form>
+                    <form th:action="@{/vocabularies/{id}/delete(id=${vocab.id})}" method="post" style="display:inline;">
+                        <input type="hidden" name="articleId" th:value="${article.id}">
+                        <button type="submit" class="btn-danger" style="padding:4px 10px; font-size:12px;">삭제</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
 </body>
 </html>

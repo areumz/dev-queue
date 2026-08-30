@@ -1,5 +1,6 @@
 package com.areumz.devqueue.controller;
 
+import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class UserController {
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("signupForm", new SignupForm());
+        model.addAttribute("roles", Role.values());
         return "signup";
     }
 
@@ -33,7 +35,7 @@ public class UserController {
             return "signup";
         }
 
-        userService.signup(form.getUsername(), form.getPassword(), form.getNickname());
+        userService.signup(form.getUsername(), form.getPassword(), form.getNickname(), form.getRole(), form.getRoleDetail());
         return "redirect:/login";
     }
 

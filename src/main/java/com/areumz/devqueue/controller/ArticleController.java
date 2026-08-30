@@ -37,6 +37,8 @@ public class ArticleController {
 
         List<Article> articles = articleService.findMyArticles(loginUser.getId(), category);
         model.addAttribute("articles", articles);
+        model.addAttribute("category", category);
+        model.addAttribute("loginUser", loginUser);
 
         LocalDate today = LocalDate.now();
 
@@ -83,6 +85,27 @@ public class ArticleController {
         model.addAttribute("article", article);
         model.addAttribute("vocabularies", vocabularyService.findByArticleId(id));
         return "articleDetail";
+    }
+
+    @GetMapping("/articles/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        Article article = articleService.findOne(id);
+        model.addAttribute("article", article);
+        return "editArticleForm";
+    }
+
+    @PostMapping("/articles/{id}/edit")
+    public String edit(@PathVariable Long id, @RequestParam String title,
+                       @RequestParam String url, Category category) {
+        articleService.updateArticle(id, title, url, category);
+        return "redirect:/articles/" + id;
+
+    }
+
+    @PostMapping("/articles/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        articleService.deleteArticle(id);
+        return "redirect:/articles";
     }
 
     @PostMapping("/articles/{id}/memo")
