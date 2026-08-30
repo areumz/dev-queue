@@ -4,6 +4,7 @@ import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.service.ArticleService;
+import com.areumz.devqueue.service.VocabularyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -19,9 +20,11 @@ import java.util.List;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final VocabularyService vocabularyService;
 
-    public ArticleController(ArticleService articleService) {
+    public ArticleController(ArticleService articleService, VocabularyService vocabularyService) {
         this.articleService = articleService;
+        this.vocabularyService = vocabularyService;
     }
 
     @GetMapping("/articles")
@@ -65,6 +68,7 @@ public class ArticleController {
             throw new IllegalArgumentException("접근 권한이 없습니다.");
         }
         model.addAttribute("article", article);
+        model.addAttribute("vocabularies", vocabularyService.findByArticleId(id));
         return "articleDetail";
     }
 
@@ -79,4 +83,24 @@ public class ArticleController {
         articleService.toggleRead(id);
         return "redirect:/articles/" + id;
     }
+
+    @PostMapping("articles/{id}/vocabularies")
+    public String addVocabulary(@PathVariable Long id, @RequestParam String word,
+                                @RequestParam String meaning) {
+        vocabularyService.addVocabulary(word, meaning, id);
+        return "redirect:/articles/" + id;
+    }
+
+    @PostMapping("vocabularies/{id}/toggle")
+    public String toggleVocabulary(@PathVariable Long id, @RequestParam Long articleId) {
+        vocabularyService.toggleMemorized(id);
+        return "redirect:/articles/" + articleId;
+    }
+
+    @PostMapping("vocabularies/{id}/delete")
+    public String deleteVocabulary(@PathVariable Long id, @RequestParam Long articleId) {
+        vocabularyService.deleteVocabulary(id);
+        return "redirect:/articles/" + articleId;
+    }
+
 }
