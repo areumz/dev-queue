@@ -1,17 +1,54 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
 <body>
 
-<form th:action="@{/signup}"  th:object="${signupForm}" method="post">
-    <input type="text" th:field="*{username}" placeholder="아이디">
-    <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></p>
-    <input type="password" th:field="*{password}" placeholder="비밀번호">
-    <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></p>
-    <input type="text" th:field="*{nickname}" placeholder="닉네임">
-    <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:red;"></p>
-    <button type="submit">회원가입</button>
-</form>
-<a href="/login">이미 계정이 있으신가요? 로그인</a>
+<div class="center-screen">
+    <div class="card" style="width:280px;">
+        <h1 class="brand" style="text-align:center; font-size:28px; margin-bottom:6px;">DevQueue</h1>
+        <p style="font-size:13px; color:#888; text-align:center; margin-bottom:1.5rem;">개발 문서, 놓치지 말고 쌓아두기</p>
 
+        <form th:action="@{/signup}" th:object="${signupForm}" method="post">
+            <div style="margin-bottom:8px;">
+                <input type="text" th:field="*{username}" placeholder="아이디">
+                <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
+            </div>
+            <div style="margin-bottom:8px;">
+                <input type="password" th:field="*{password}" placeholder="비밀번호">
+                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
+            </div>
+            <div style="margin-bottom:14px;">
+                <input type="text" th:field="*{nickname}" placeholder="닉네임">
+                <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
+            </div>
+            <div style="margin-bottom:14px;">
+                <label style="font-size:13px; color:#888; display:block; margin-bottom:8px; padding-left:10px;">직종</label>
+                <div style="display:flex; flex-direction:column; gap:8px; padding-left:10px;">
+                    <div th:each="r : ${roles}" style="display:flex; align-items:center; gap:8px; font-size:14px; margin-bottom:8px;">
+                        <input type="radio" name="role" th:value="${r}" th:id="${'role-' + r}">
+                        <label th:for="${'role-' + r}" th:text="${r.label}"></label>
+                    </div>
+                    <input type="text" name="roleDetail" id="roleDetailInput" placeholder="직접 입력"
+                           style="display:none; margin-top:8px; margin-bottom:14px;">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;">회원가입</button>
+        </form>
+        <p style="font-size:13px; color:#888; text-align:center; margin-top:14px;">
+            이미 계정이 있으신가요? <a th:href="@{/login}" style="color:#3B6D11; font-weight:500;">로그인</a>
+        </p>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('input[name="role"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+                let isEtc = radio.value === 'ETC';
+            document.getElementById('roleDetailInput').style.display = 
+               isEtc ? 'block' : 'none';
+        });
+    });
+</script>
 </body>
 </html>

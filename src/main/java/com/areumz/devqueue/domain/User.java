@@ -8,11 +8,16 @@ public class User {
     private String password;
     private String nickname;
     private LocalDate lastPopupDate;
+    private Role role;
+    private String roleDetail;
 
-    public User(String username, String password, String nickname) {
+    public User(String username, String password, String nickname,
+                Role role, String roleDetail) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
+        this.role = role;
+        this.roleDetail = roleDetail;
     }
 
     public Long getId() {

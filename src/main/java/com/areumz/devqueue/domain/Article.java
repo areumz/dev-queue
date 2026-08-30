@@ -60,5 +60,14 @@ public class Article {
         this.read = !this.read;
     }
 
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+    public void changeUrl(String url) {
+        this.url = url;
+    }
 
+    public void changeCategory(Category category) {
+        this.category = category;
+    }
 }

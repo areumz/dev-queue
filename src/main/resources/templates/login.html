@@ -1,14 +1,28 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
 <body>
-<p th:if="${error}" th:text="${error}" style="color:red;"></p>
 
-<form action="/login" method="post">
-    <input type="text" name="username" placeholder="아이디">
-    <input type="password" name="password" placeholder="비밀번호">
-    <button type="submit">로그인</button>
-</form>
-<a href="/signup">계정이 없으신가요? 회원가입</a>
+<div class="center-screen" style="display:flex; justify-content:center; padding-top:4rem;">
+    <div class="card" style="width:280px;">
+        <h1 class="brand" style="text-align:center; font-size:28px; margin-bottom:6px;">DevQueue</h1>
+        <p style="font-size:13px; color:#888; text-align:center; margin-bottom:1.5rem;">개발 문서, 놓치지 말고 쌓아두기</p>
+
+        <p th:if="${error}" th:text="${error}" style="color:red; font-size:13px;"></p>
+
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="아이디" style="margin-bottom:8px;">
+            <input type="password" name="password" placeholder="비밀번호" style="margin-bottom:14px;">
+            <button type="submit" class="btn-primary" style="width:100%;">로그인</button>
+        </form>
+        <p style="font-size:13px; color:#888; text-align:center; margin-top:14px;">
+            계정이 없으신가요? <a href="/signup" style="color:#3B6D11; font-weight:500;">회원가입</a>
+        </p>
+    </div>
+</div>
 
 </body>
 </html>

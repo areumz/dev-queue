@@ -1,5 +1,6 @@
 package com.areumz.devqueue.controller;
 
+import com.areumz.devqueue.domain.Role;
 import jakarta.validation.constraints.NotBlank;
 
 public class SignupForm {
@@ -12,6 +13,9 @@ public class SignupForm {
 
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
+
+    private Role role;
+    private String roleDetail;
 
     public String getUsername() {
         return username;
@@ -35,5 +39,21 @@ public class SignupForm {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getRoleDetail() {
+        return roleDetail;
+    }
+
+    public void setRoleDetail(String roleDetail) {
+        this.roleDetail = roleDetail;
     }
 }

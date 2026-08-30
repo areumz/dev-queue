@@ -49,4 +49,15 @@ public class ArticleService {
                 .filter(article->category==null || article.getCategory() == category )
                 .toList();
     }
+
+    public void updateArticle(Long id, String title, String url, Category category) {
+        Article article = articleRepository.findById(id).orElseThrow();
+        article.changeTitle(title);
+        article.changeUrl(url);
+        article.changeCategory(category);
+    }
+
+    public void deleteArticle(Long id) {
+        articleRepository.deleteById(id);
+    }
 }

@@ -1,5 +1,6 @@
 package com.areumz.devqueue.service;
 
+import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +16,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signup(String username, String rawPassword, String nickname) {
+    public User signup(String username, String rawPassword, String nickname,
+                       Role role, String roleDetail) {
         // 1.아이디 중복 체크
         userRepository.findByUsername(username).ifPresent(user -> {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
@@ -25,7 +27,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         // 3. User 생성 및 저장
-        User user = new User(username, encodedPassword, nickname);
+        User user = new User(username, encodedPassword, nickname, role, roleDetail);
         return userRepository.save(user);
     }
 
