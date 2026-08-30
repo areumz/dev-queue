@@ -2,6 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <body>
+<div th:if="${popupWords != null}" style="border:1px solid black; padding:10px;">
+    <h3>오늘의 단어</h3>
+    <form th:action="@{/vocabularies/memorize}" method="post">
+        <div th:each="word : ${popupWords}">
+            <input type="checkbox" name="ids" th:value="${word.id}">
+            <span th:text="${word.word}"></span> -
+            <span th:text="${word.meaning}"></span>
+        </div>
+        <button type="submit">확인, 오늘도 시작!</button>
+    </form>
+</div>
+
+<a th:href="@{/articles/new}">+ 문서 추가</a>
+
 <div>
     <a th:href="@{/articles}">전체</a>
     <a th:href="@{/articles(category='DEV_DOC')}">개발문서</a>

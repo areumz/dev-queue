@@ -1,10 +1,13 @@
 package com.areumz.devqueue.domain;
 
+import java.time.LocalDate;
+
 public class User {
     private Long id;
     private String username;
     private String password;
     private String nickname;
+    private LocalDate lastPopupDate;
 
     public User(String username, String password, String nickname) {
         this.username = username;
@@ -30,5 +33,13 @@ public class User {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public LocalDate getLastPopupDate() {
+        return lastPopupDate;
+    }
+
+    public void updatePopupDate(LocalDate date) {
+        this.lastPopupDate = date;
     }
 }
