@@ -11,6 +11,7 @@
         <h1 class="brand" style="text-align:center; font-size:28px; margin-bottom:6px;">DevQueue</h1>
         <p style="font-size:13px; color:#888; text-align:center; margin-bottom:1.5rem;">개발 문서, 놓치지 말고 쌓아두기</p>
 
+        <p th:if="${message}" th:text="${message}" style="color:#3B6D11; font-size:13px; margin-bottom:12px;"></p>
         <p th:if="${error}" th:text="${error}" style="color:red; font-size:13px;"></p>
 
         <form action="/login" method="post">

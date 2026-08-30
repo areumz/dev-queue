@@ -2,6 +2,7 @@ package com.areumz.devqueue.repository.memory;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.repository.ArticleRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
+@Profile("memory")
 public class MemoryArticleRepository implements ArticleRepository {
     private final ConcurrentHashMap<Long, Article> articles = new ConcurrentHashMap<>();
 

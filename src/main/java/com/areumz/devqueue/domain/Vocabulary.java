@@ -1,11 +1,20 @@
 package com.areumz.devqueue.domain;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Vocabulary {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String word;
     private String meaning;
     private boolean memorized;
     private Long articleId;
+
+    protected Vocabulary() {
+    }
 
     public Vocabulary(String word, String meaning, Long articleId) {
         this.word = word;

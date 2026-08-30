@@ -5,6 +5,9 @@ import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 public class UserService {
@@ -40,5 +43,11 @@ public class UserService {
         }
 
         return user;
+    }
+
+    @Transactional
+    public void updatePopupDate(Long userId, LocalDate date) {
+        User user = userRepository.findById(userId).orElseThrow();
+        user.updatePopupDate(date);
     }
 }

@@ -4,6 +4,7 @@ import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.repository.ArticleRepository;
 import com.areumz.devqueue.repository.VocabularyRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,11 +31,13 @@ public class VocabularyService {
         return vocabularyRepository.findByArticleId(articleId);
     }
 
+    @Transactional
     public void toggleMemorized(Long id) {
         Vocabulary vocabulary = vocabularyRepository.findById(id).orElseThrow();
         vocabulary.toggleMemorized();
     }
 
+    @Transactional
     public void deleteVocabulary(Long id) {
         vocabularyRepository.deleteById(id);
     }

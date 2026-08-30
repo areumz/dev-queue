@@ -2,6 +2,7 @@ package com.areumz.devqueue.repository.memory;
 
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.repository.VocabularyRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
+@Profile("memory")
 public class MemoryVocabularyRepository implements VocabularyRepository {
     private final ConcurrentHashMap<Long, Vocabulary> vocabularies = new ConcurrentHashMap<>();
     private final AtomicLong sequence = new AtomicLong(0L);

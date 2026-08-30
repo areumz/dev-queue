@@ -5,6 +5,7 @@ import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.service.ArticleService;
+import com.areumz.devqueue.service.UserService;
 import com.areumz.devqueue.service.VocabularyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,10 +24,13 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final VocabularyService vocabularyService;
+    private final UserService userService;
 
-    public ArticleController(ArticleService articleService, VocabularyService vocabularyService) {
+    public ArticleController(ArticleService articleService, VocabularyService vocabularyService,
+                             UserService userService) {
         this.articleService = articleService;
         this.vocabularyService = vocabularyService;
+        this.userService = userService;
     }
 
     @GetMapping("/articles")
@@ -47,6 +51,7 @@ public class ArticleController {
 
             if(!popupWords.isEmpty()) {
                 model.addAttribute("popupWords", popupWords);
+                userService.updatePopupDate(loginUser.getId(), today);
                 loginUser.updatePopupDate(today);
             }
         }
