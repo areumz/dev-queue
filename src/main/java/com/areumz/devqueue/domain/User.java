@@ -1,15 +1,27 @@
 package com.areumz.devqueue.domain;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String username;
     private String password;
     private String nickname;
     private LocalDate lastPopupDate;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
+
     private String roleDetail;
+
+    protected User() {
+    }
 
     public User(String username, String password, String nickname,
                 Role role, String roleDetail) {

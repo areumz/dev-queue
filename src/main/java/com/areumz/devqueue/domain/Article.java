@@ -1,13 +1,27 @@
 package com.areumz.devqueue.domain;
 
+import jakarta.persistence.*;
+import jakarta.persistence.Column;
+
+@Entity
 public class Article {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String url;
+
+    @Enumerated(EnumType.STRING)
     private Category category;
+
     private String memo;
+    @Column(name = "is_read")
     private boolean read;
     private Long userId;
+
+    protected Article() {
+    }
 
     public Article(String title, String url, Category category, String memo) {
         this.title = title;

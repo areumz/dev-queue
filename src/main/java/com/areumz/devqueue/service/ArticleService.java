@@ -4,6 +4,7 @@ import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,11 +28,13 @@ public class ArticleService {
         return articleRepository.findById(id).orElseThrow();
     }
 
+    @Transactional
     public void updateMemo(Long id, String memo) {
         Article article = articleRepository.findById(id).orElseThrow();
         article.changeMemo(memo);
     }
 
+    @Transactional
     public void toggleRead(Long id) {
         Article article = articleRepository.findById(id).orElseThrow();
         article.toggleRead();
@@ -50,6 +53,7 @@ public class ArticleService {
                 .toList();
     }
 
+    @Transactional
     public void updateArticle(Long id, String title, String url, Category category) {
         Article article = articleRepository.findById(id).orElseThrow();
         article.changeTitle(title);

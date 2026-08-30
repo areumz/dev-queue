@@ -1,5 +1,6 @@
 package com.areumz.devqueue.repository.memory;
 
+import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class MemoryUserRepositoryTest {
 
     @Test
    public void save() {
-        User user = new User("user1", "a123", "user_1");
+        User user = new User("user1", "a123", "user_1", Role.FRONTEND, null);
         repository.save(user);
 
         User result = repository.findById(user.getId()).get();
@@ -27,7 +28,7 @@ class MemoryUserRepositoryTest {
 
     @Test
     public void findUsername() {
-        User user1 = new User("user1", "a123", "user_1");
+        User user1 = new User("user1", "a123", "user_1", Role.APP, null);
         repository.save(user1);
 
         User result = repository.findByUsername("user1").get();
@@ -36,10 +37,10 @@ class MemoryUserRepositoryTest {
 
     @Test
     public void findAll() {
-        User user1 = new User("user1", "a123", "user_1");
+        User user1 = new User("user1", "a123", "user_1", Role.FRONTEND, null);
         repository.save(user1);
 
-        User user2 = new User("user2", "a123", "user_2");
+        User user2 = new User("user2", "a123", "user_2", Role.FRONTEND, null);
         repository.save(user2);
 
         List<User> result = repository.findAll();
