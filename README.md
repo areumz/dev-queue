@@ -3,7 +3,7 @@
 개발 문서/영상을 카테고리별로 저장하고, 모르는 단어를 등록해 매일 랜덤으로 복습하는 개인용 읽을거리 큐 + 단어장 서비스입니다. <br />
 A personal reading-queue and vocabulary app that saves dev articles/videos by category, and lets you review random unknown words once a day.
 
-**🔗 배포 링크 / Live demo: [devqueue.duckdns.org](http://devqueue.duckdns.org)**
+**🔗 배포 링크 / Live demo: [devqueue.duckdns.org](http://devqueue.duckdns.org/login)**
 
 <table>
   <tr>
