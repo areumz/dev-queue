@@ -38,3 +38,6 @@ out/
 src/main/resources/application-local.properties
 .DS_Store
 **/.DS_Store
+
+### v2 brainstorming brief (local only) ###
+docs/v2/brief.md
