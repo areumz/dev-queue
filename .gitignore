@@ -41,3 +41,4 @@ src/main/resources/application-local.properties
 
 ### v2 brainstorming brief (local only) ###
 docs/v2/brief.md
+docs/plans/**/*.code.md
