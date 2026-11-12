@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Spring injects beans through constructors. Storing them in a field is the intended design, not a leak. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- v2-0b: session will store a userId/DTO instead of the User entity. Remove this entry then. -->
+    <Match>
+        <Class name="com.areumz.devqueue.controller.UserController"/>
+        <Bug pattern="J2EE_STORE_OF_NON_SERIALIZABLE_OBJECT_INTO_SESSION"/>
+    </Match>
+</FindBugsFilter>

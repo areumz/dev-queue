@@ -52,6 +52,10 @@ public class User {
         return nickname;
     }
 
+    public String getRoleDetail() {
+        return roleDetail;
+    }
+
     public LocalDate getLastPopupDate() {
         return lastPopupDate;
     }
