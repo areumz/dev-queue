@@ -17,15 +17,6 @@
 - 테스트 프로필은 `test,jpa`. 테스트에서 `local` 프로필을 켜지 않는다.
 - 운영 설정(`ddl-auto=update`, `show-sql`)은 건드리지 않는다. `spring.h2.console.enabled` 한 줄만 지운다.
 - git worktree를 쓰지 않는다. 코드 포함 계획과 `application-local.properties`가 gitignore라서 worktree에 없다.
-- 커밋 방식: Task 1~5 동안은 커밋하지 않고 변경을 쌓아 둔다. 모두 끝나면 사용자에게 한 번에 보여 주고, 승인받은 뒤 Task별로 나눠 커밋한다.
-
-## 사전 검증 결과 (2026-11-10)
-
-계획을 쓰기 전에 저장소 복사본에서 미리 돌려 봤다.
-
-- Java 25 + foojay: JDK 25.0.5 자동 다운로드, 컴파일 성공
-- SpotBugs 기존 경고 **7개** → 아래 Task 2 적용 후 **0개**
-- Testcontainers + MockMvc: 테스트 11개 통과, 테스트 끝난 뒤 컨테이너 자동 삭제 확인
 
 ## 바뀌는 파일
 
