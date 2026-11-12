@@ -1,6 +1,6 @@
 # v2-0a 테스트 기반 구현 계획
 
-> 설계 문서: [docs/brainstorming/v2-0/a-test-foundation.md](../../brainstorming/v2-0/a-test-foundation.md)
+> 설계 문서: [docs/brainstorming/v2-0/a-test-foundation-brainstorming.md](../../brainstorming/v2-0/a-test-foundation-brainstorming.md)
 
 **목표:** 외부 DB 없이 `./gradlew test`가 어디서든 돌고, CI가 테스트 실패한 PR을 막는다.
 
