@@ -1,9 +1,9 @@
 package com.areumz.devqueue;
 
+import com.areumz.devqueue.support.IntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@IntegrationTest
 class DevqueueApplicationTests {
 
 	@Test
