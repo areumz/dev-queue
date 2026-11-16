@@ -28,8 +28,8 @@ public class ArticleService {
 
     @Transactional
     public Article create(Long userId, String title, String url, Category category, String memo) {
-        requireHttpUrl(url);
-        Article article = new Article(title, url, category, memo);
+        String stripped = requireHttpUrl(url);
+        Article article = new Article(title, stripped, category, memo);
         article.setUserId(userId);
         return articleRepository.save(article);
     }
@@ -64,9 +64,9 @@ public class ArticleService {
     @Transactional
     public void updateArticle(Long id, Long userId, String title, String url, Category category) {
         Article article = findMyArticle(id, userId);
-        requireHttpUrl(url);
+        String stripped = requireHttpUrl(url);
         article.changeTitle(title);
-        article.changeUrl(url);
+        article.changeUrl(stripped);
         article.changeCategory(category);
     }
 
@@ -75,10 +75,11 @@ public class ArticleService {
         articleRepository.deleteById(findMyArticle(id, userId).getId());
     }
 
-    private static void requireHttpUrl(String url) {
-        if (url == null || url.isBlank()) {
+    private static String requireHttpUrl(String rawUrl) {
+        if (rawUrl == null || rawUrl.isBlank()) {
             throw new InvalidUrlException();
         }
+        String url = rawUrl.strip();
         try {
             URI uri = new URI(url);
             String scheme = uri.getScheme();
@@ -87,6 +88,7 @@ public class ArticleService {
             if (!httpScheme || uri.getHost() == null) {
                 throw new InvalidUrlException();
             }
+            return url;
         } catch (URISyntaxException e) {
             throw new InvalidUrlException();
         }

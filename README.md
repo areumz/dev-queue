@@ -166,7 +166,7 @@ dev-queue/
 │   ├── repository/              # 인터페이스 + memory/jpa 구현체 / interfaces + memory/jpa implementations
 │   ├── service/
 │   ├── controller/
-│   └── config/                  # SecurityConfig, WebConfig, LoginCheckInterceptor
+│   └── config/                  # SecurityConfig
 ├── src/main/resources/
 │   ├── templates/                # Thymeleaf views
 │   └── static/css/               # custom styles

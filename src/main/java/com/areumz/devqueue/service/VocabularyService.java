@@ -35,7 +35,8 @@ public class VocabularyService {
         return vocabularyRepository.save(new Vocabulary(word, meaning, articleId));
     }
 
-    public List<Vocabulary> findByArticleId(Long articleId) {
+    public List<Vocabulary> findByArticleId(Long articleId, Long userId) {
+        findMyArticle(articleId, userId);
         return vocabularyRepository.findByArticleId(articleId);
     }
 

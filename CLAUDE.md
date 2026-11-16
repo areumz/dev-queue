@@ -4,7 +4,7 @@
 
 ## 스택
 
-Java 25, Spring Boot 4.1.1, Thymeleaf(SSR), Spring Data JPA, MySQL 8. 인증은 세션 + BCrypt(`spring-security-crypto`).
+Java 25, Spring Boot 4.1.1, Thymeleaf(SSR), Spring Data JPA, MySQL 8. 인증은 Spring Security 폼 로그인 + BCrypt(세션에는 `LoginUser`만 저장).
 
 ## 명령어
 

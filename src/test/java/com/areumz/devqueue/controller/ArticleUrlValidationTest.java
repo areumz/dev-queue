@@ -77,6 +77,29 @@ class ArticleUrlValidationTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"https://example.com ", " https://example.com"})
+    void createStripsSurroundingWhitespace(String url) throws Exception {
+        mockMvc.perform(post("/articles/new").with(TestAuth.loginAs(alice)).with(csrf())
+                        .param("title", "t").param("url", url)
+                        .param("category", "AI").param("memo", "m"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/articles"));
+        assertThat(articleService.findMyArticles(alice.getId(), null))
+                .extracting(Article::getUrl).containsExactly("https://example.com");
+    }
+
+    @Test
+    void editStripsSurroundingWhitespace() throws Exception {
+        Article article = save(alice);
+        mockMvc.perform(post("/articles/" + article.getId() + "/edit")
+                        .with(TestAuth.loginAs(alice)).with(csrf())
+                        .param("title", "t").param("url", " https://example.org ").param("category", "AI"))
+                .andExpect(status().is3xxRedirection());
+        assertThat(articleRepository.findById(article.getId()).orElseThrow().getUrl())
+                .isEqualTo("https://example.org");
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"javascript:alert(1)", "JavaScript:alert(1)", " javascript:alert(1)",
             "https://", "http:foo", "ftp://example.com", "", "   "})
     void editRejectsNonHttpUrl(String url) throws Exception {

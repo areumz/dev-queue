@@ -69,7 +69,7 @@ public class ArticleController {
     public String detail(@PathVariable Long id, Model model,
                          @AuthenticationPrincipal LoginUser loginUser) {
         model.addAttribute("article", articleService.findMyArticle(id, loginUser.getId()));
-        model.addAttribute("vocabularies", vocabularyService.findByArticleId(id));
+        model.addAttribute("vocabularies", vocabularyService.findByArticleId(id, loginUser.getId()));
         return "articleDetail";
     }
 

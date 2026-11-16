@@ -1,6 +1,7 @@
 package com.areumz.devqueue.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,7 +15,9 @@ import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.repository.ArticleRepository;
 import com.areumz.devqueue.repository.UserRepository;
+import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.VocabularyRepository;
+import com.areumz.devqueue.service.VocabularyService;
 import com.areumz.devqueue.support.IntegrationTest;
 import com.areumz.devqueue.support.TestAuth;
 import jakarta.persistence.EntityManager;
@@ -39,6 +42,9 @@ class ArticleOwnershipTest {
 
     @Autowired
     VocabularyRepository vocabularyRepository;
+
+    @Autowired
+    VocabularyService vocabularyService;
 
     @Autowired
     EntityManager entityManager;
@@ -215,5 +221,11 @@ class ArticleOwnershipTest {
     void memorizeWithNoIdsJustRedirects() throws Exception {
         mockMvc.perform(post("/vocabularies/memorize").with(TestAuth.loginAs(alice)).with(csrf()))
                 .andExpect(redirectedUrl("/articles"));
+    }
+
+    @Test
+    void vocabularyServiceRefusesListingOthersArticle() {
+        assertThatThrownBy(() -> vocabularyService.findByArticleId(article.getId(), bob.getId()))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 }
