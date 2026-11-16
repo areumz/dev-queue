@@ -1,12 +1,10 @@
 package com.areumz.devqueue.controller;
 
+import com.areumz.devqueue.auth.LoginUser;
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
-import com.areumz.devqueue.auth.LoginUser;
-import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.service.ArticleService;
-import com.areumz.devqueue.service.UserService;
 import com.areumz.devqueue.service.VocabularyService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -24,13 +21,10 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final VocabularyService vocabularyService;
-    private final UserService userService;
 
-    public ArticleController(ArticleService articleService, VocabularyService vocabularyService,
-                             UserService userService) {
+    public ArticleController(ArticleService articleService, VocabularyService vocabularyService) {
         this.articleService = articleService;
         this.vocabularyService = vocabularyService;
-        this.userService = userService;
     }
 
     @GetMapping("/articles")
@@ -41,16 +35,9 @@ public class ArticleController {
         model.addAttribute("category", category);
         model.addAttribute("loginUser", loginUser);
 
-        LocalDate today = LocalDate.now();
-
-        User user = userService.findById(loginUser.getId());
-        if(!today.equals(user.getLastPopupDate())) {
-            List<Vocabulary> popupWords = vocabularyService.getRandomUnmemorized(loginUser.getId());
-
-            if(!popupWords.isEmpty()) {
-                model.addAttribute("popupWords", popupWords);
-                userService.updatePopupDate(loginUser.getId(), today);
-            }
+        List<Vocabulary> popupWords = vocabularyService.takeTodayPopupWords(loginUser.getId());
+        if(!popupWords.isEmpty()) {
+            model.addAttribute("popupWords", popupWords);
         }
         return "articles";
     }

@@ -1,12 +1,15 @@
 package com.areumz.devqueue.service;
 
 import com.areumz.devqueue.domain.Article;
+import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.repository.ArticleRepository;
+import com.areumz.devqueue.repository.UserRepository;
 import com.areumz.devqueue.repository.VocabularyRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,11 +18,14 @@ import java.util.List;
 public class VocabularyService {
     private final VocabularyRepository vocabularyRepository;
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
 
     public VocabularyService(VocabularyRepository vocabularyRepository,
-                             ArticleRepository articleRepository) {
+                             ArticleRepository articleRepository,
+                             UserRepository userRepository) {
         this.vocabularyRepository = vocabularyRepository;
         this.articleRepository = articleRepository;
+        this.userRepository = userRepository;
     }
 
     public Vocabulary addVocabulary(String word, String meaning, Long articleId) {
@@ -65,5 +71,19 @@ public class VocabularyService {
         Collections.shuffle(unmemorized);
         int count = Math.min(3, unmemorized.size());
         return new ArrayList<>(unmemorized.subList(0, count));
+    }
+
+    @Transactional
+    public List<Vocabulary> takeTodayPopupWords(Long userId) {
+        LocalDate today = LocalDate.now();
+        User user = userRepository.findById(userId).orElseThrow();
+        if (today.equals(user.getLastPopupDate())) {
+            return List.of();
+        }
+        List<Vocabulary> words = getRandomUnmemorized(userId);
+        if (!words.isEmpty()) {
+            user.updatePopupDate(today);
+        }
+        return words;
     }
 }
