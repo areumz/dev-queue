@@ -23,7 +23,9 @@ Java 25, Spring Boot 4.1.1, Thymeleaf(SSR), Spring Data JPA, MySQL 8. 인증은 
 
 - TDD: 실패하는 테스트 → 실패 확인 → 최소 구현 → 통과 확인.
 - 컨트롤러·통합 테스트는 클래스에 `@IntegrationTest @Transactional`을 붙인다. `@Transactional`이 테스트마다 DB를 되돌린다.
-- 로그인한 사용자는 `TestSessions.loginAs(user)`로 흉내 낸다(v2-0b에서 Spring Security 방식으로 바뀐다).
+- 로그인한 사용자는 `TestAuth.loginAs(user)`로 흉내 낸다(`.with(...)`).
+- POST 요청에는 `.with(csrf())`를 붙인다.
+- 남의 리소스 접근 테스트는 404를 기대한다.
 - 예시: `src/test/java/com/areumz/devqueue/controller/ArticleControllerTest.java`
 
 ## 코드 규칙

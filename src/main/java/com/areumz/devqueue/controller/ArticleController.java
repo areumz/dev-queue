@@ -4,6 +4,7 @@ import com.areumz.devqueue.auth.LoginUser;
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.domain.Vocabulary;
+import com.areumz.devqueue.exception.InvalidUrlException;
 import com.areumz.devqueue.service.ArticleService;
 import com.areumz.devqueue.service.VocabularyService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,8 +51,17 @@ public class ArticleController {
     @PostMapping("/articles/new")
     public String create(@RequestParam String title, @RequestParam String url,
                          @RequestParam Category category, @RequestParam String memo,
-                         @AuthenticationPrincipal LoginUser loginUser) {
-        articleService.create(loginUser.getId(), title, url, category, memo);
+                         Model model, @AuthenticationPrincipal LoginUser loginUser) {
+        try {
+            articleService.create(loginUser.getId(), title, url, category, memo);
+        } catch (InvalidUrlException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("title", title);
+            model.addAttribute("url", url);
+            model.addAttribute("category", category);
+            model.addAttribute("memo", memo);
+            return "createArticleForm";
+        }
         return "redirect:/articles";
     }
 
@@ -73,8 +83,18 @@ public class ArticleController {
     @PostMapping("/articles/{id}/edit")
     public String edit(@PathVariable Long id, @RequestParam String title,
                        @RequestParam String url, Category category,
-                       @AuthenticationPrincipal LoginUser loginUser) {
-        articleService.updateArticle(id, loginUser.getId(), title, url, category);
+                       Model model, @AuthenticationPrincipal LoginUser loginUser) {
+        try {
+            articleService.updateArticle(id, loginUser.getId(), title, url, category);
+        } catch (InvalidUrlException e) {
+            // article is the stored one (for the id); entered values override it in the form
+            model.addAttribute("article", articleService.findMyArticle(id, loginUser.getId()));
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("title", title);
+            model.addAttribute("url", url);
+            model.addAttribute("category", category);
+            return "editArticleForm";
+        }
         return "redirect:/articles/" + id;
     }
 

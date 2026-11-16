@@ -2,11 +2,14 @@ package com.areumz.devqueue.service;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
+import com.areumz.devqueue.exception.InvalidUrlException;
 import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Service
@@ -25,6 +28,7 @@ public class ArticleService {
 
     @Transactional
     public Article create(Long userId, String title, String url, Category category, String memo) {
+        requireHttpUrl(url);
         Article article = new Article(title, url, category, memo);
         article.setUserId(userId);
         return articleRepository.save(article);
@@ -60,6 +64,7 @@ public class ArticleService {
     @Transactional
     public void updateArticle(Long id, Long userId, String title, String url, Category category) {
         Article article = findMyArticle(id, userId);
+        requireHttpUrl(url);
         article.changeTitle(title);
         article.changeUrl(url);
         article.changeCategory(category);
@@ -68,5 +73,22 @@ public class ArticleService {
     @Transactional
     public void deleteArticle(Long id, Long userId) {
         articleRepository.deleteById(findMyArticle(id, userId).getId());
+    }
+
+    private static void requireHttpUrl(String url) {
+        if (url == null || url.isBlank()) {
+            throw new InvalidUrlException();
+        }
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            boolean httpScheme = scheme != null
+                    && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme));
+            if (!httpScheme || uri.getHost() == null) {
+                throw new InvalidUrlException();
+            }
+        } catch (URISyntaxException e) {
+            throw new InvalidUrlException();
+        }
     }
 }
