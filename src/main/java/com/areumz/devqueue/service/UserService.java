@@ -45,6 +45,10 @@ public class UserService {
         return user;
     }
 
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow();
+    }
+
     @Transactional
     public void updatePopupDate(Long userId, LocalDate date) {
         User user = userRepository.findById(userId).orElseThrow();

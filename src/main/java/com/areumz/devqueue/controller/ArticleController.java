@@ -2,13 +2,13 @@ package com.areumz.devqueue.controller;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
+import com.areumz.devqueue.auth.LoginUser;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.service.ArticleService;
 import com.areumz.devqueue.service.UserService;
 import com.areumz.devqueue.service.VocabularyService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +35,7 @@ public class ArticleController {
 
     @GetMapping("/articles")
     public String list(@RequestParam(required = false) Category category, Model model,
-                       HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        User loginUser = (User) session.getAttribute("loginUser");
-
+                       @AuthenticationPrincipal LoginUser loginUser) {
         List<Article> articles = articleService.findMyArticles(loginUser.getId(), category);
         model.addAttribute("articles", articles);
         model.addAttribute("category", category);
@@ -46,13 +43,13 @@ public class ArticleController {
 
         LocalDate today = LocalDate.now();
 
-        if(!today.equals(loginUser.getLastPopupDate())) {
+        User user = userService.findById(loginUser.getId());
+        if(!today.equals(user.getLastPopupDate())) {
             List<Vocabulary> popupWords = vocabularyService.getRandomUnmemorized(loginUser.getId());
 
             if(!popupWords.isEmpty()) {
                 model.addAttribute("popupWords", popupWords);
                 userService.updatePopupDate(loginUser.getId(), today);
-                loginUser.updatePopupDate(today);
             }
         }
         return "articles";
@@ -66,10 +63,8 @@ public class ArticleController {
     @PostMapping("/articles/new")
     public String create(@RequestParam String title, @RequestParam String url,
                          @RequestParam Category category, @RequestParam String memo,
-                         HttpServletRequest request) {
+                         @AuthenticationPrincipal LoginUser loginUser) {
         Article article = new Article(title, url, category, memo);
-        HttpSession session = request.getSession(false);
-        User loginUser = (User) session.getAttribute("loginUser");
         article.setUserId(loginUser.getId());
 
         articleService.save(article);
@@ -78,10 +73,7 @@ public class ArticleController {
 
     @GetMapping("/articles/{id}")
     public String detail(@PathVariable Long id, Model model,
-                         HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        User loginUser = (User) session.getAttribute("loginUser");
-
+                         @AuthenticationPrincipal LoginUser loginUser) {
         Article article = articleService.findOne(id);
 
         if(!article.getUserId().equals(loginUser.getId())) {

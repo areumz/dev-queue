@@ -13,7 +13,7 @@ import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.repository.ArticleRepository;
 import com.areumz.devqueue.repository.UserRepository;
 import com.areumz.devqueue.support.IntegrationTest;
-import com.areumz.devqueue.support.TestSessions;
+import com.areumz.devqueue.support.TestAuth;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,8 +46,9 @@ class ArticleControllerTest {
         article.setUserId(user.getId());
         articleRepository.save(article);
 
-        mockMvc.perform(get("/articles").session(TestSessions.loginAs(user)))
+        mockMvc.perform(get("/articles").with(TestAuth.loginAs(user)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("내 글 제목")));
+                .andExpect(content().string(containsString("내 글 제목")))
+                .andExpect(content().string(containsString("앨리스님")));
     }
 }
