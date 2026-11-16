@@ -51,85 +51,74 @@ public class ArticleController {
     public String create(@RequestParam String title, @RequestParam String url,
                          @RequestParam Category category, @RequestParam String memo,
                          @AuthenticationPrincipal LoginUser loginUser) {
-        Article article = new Article(title, url, category, memo);
-        article.setUserId(loginUser.getId());
-
-        articleService.save(article);
+        articleService.create(loginUser.getId(), title, url, category, memo);
         return "redirect:/articles";
     }
 
     @GetMapping("/articles/{id}")
     public String detail(@PathVariable Long id, Model model,
                          @AuthenticationPrincipal LoginUser loginUser) {
-        Article article = articleService.findOne(id);
-
-        if(!article.getUserId().equals(loginUser.getId())) {
-            throw new IllegalArgumentException("접근 권한이 없습니다.");
-        }
-        model.addAttribute("article", article);
+        model.addAttribute("article", articleService.findMyArticle(id, loginUser.getId()));
         model.addAttribute("vocabularies", vocabularyService.findByArticleId(id));
         return "articleDetail";
     }
 
     @GetMapping("/articles/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
-        Article article = articleService.findOne(id);
-        model.addAttribute("article", article);
+    public String editForm(@PathVariable Long id, Model model,
+                           @AuthenticationPrincipal LoginUser loginUser) {
+        model.addAttribute("article", articleService.findMyArticle(id, loginUser.getId()));
         return "editArticleForm";
     }
 
     @PostMapping("/articles/{id}/edit")
     public String edit(@PathVariable Long id, @RequestParam String title,
-                       @RequestParam String url, Category category) {
-        articleService.updateArticle(id, title, url, category);
+                       @RequestParam String url, Category category,
+                       @AuthenticationPrincipal LoginUser loginUser) {
+        articleService.updateArticle(id, loginUser.getId(), title, url, category);
         return "redirect:/articles/" + id;
-
     }
 
     @PostMapping("/articles/{id}/delete")
-    public String delete(@PathVariable Long id) {
-        articleService.deleteArticle(id);
+    public String delete(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser) {
+        articleService.deleteArticle(id, loginUser.getId());
         return "redirect:/articles";
     }
 
     @PostMapping("/articles/{id}/memo")
-    public String updateMemo(@PathVariable Long id, @RequestParam String memo) {
-        articleService.updateMemo(id, memo);
+    public String updateMemo(@PathVariable Long id, @RequestParam String memo,
+                             @AuthenticationPrincipal LoginUser loginUser) {
+        articleService.updateMemo(id, loginUser.getId(), memo);
         return "redirect:/articles/" + id;
     }
 
     @PostMapping("/articles/{id}/read")
-    public String toggleRead(@PathVariable Long id) {
-        articleService.toggleRead(id);
+    public String toggleRead(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser) {
+        articleService.toggleRead(id, loginUser.getId());
         return "redirect:/articles/" + id;
     }
 
     @PostMapping("/articles/{id}/vocabularies")
     public String addVocabulary(@PathVariable Long id, @RequestParam String word,
-                                @RequestParam String meaning) {
-        vocabularyService.addVocabulary(word, meaning, id);
+                                @RequestParam String meaning,
+                                @AuthenticationPrincipal LoginUser loginUser) {
+        vocabularyService.addVocabulary(id, loginUser.getId(), word, meaning);
         return "redirect:/articles/" + id;
     }
 
     @PostMapping("/vocabularies/{id}/toggle")
-    public String toggleVocabulary(@PathVariable Long id, @RequestParam Long articleId) {
-        vocabularyService.toggleMemorized(id);
-        return "redirect:/articles/" + articleId;
+    public String toggleVocabulary(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser) {
+        return "redirect:/articles/" + vocabularyService.toggleMemorized(id, loginUser.getId());
     }
 
     @PostMapping("/vocabularies/{id}/delete")
-    public String deleteVocabulary(@PathVariable Long id, @RequestParam Long articleId) {
-        vocabularyService.deleteVocabulary(id);
-        return "redirect:/articles/" + articleId;
+    public String deleteVocabulary(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser) {
+        return "redirect:/articles/" + vocabularyService.deleteVocabulary(id, loginUser.getId());
     }
 
     @PostMapping("/vocabularies/memorize")
-    public String memorize(@RequestParam(required = false) List<Long> ids) {
-        if(ids != null) {
-            for(Long id : ids) {
-                vocabularyService.toggleMemorized(id);
-            }
-        }
+    public String memorize(@RequestParam(required = false) List<Long> ids,
+                           @AuthenticationPrincipal LoginUser loginUser) {
+        vocabularyService.memorize(ids, loginUser.getId());
         return "redirect:/articles";
     }
 }

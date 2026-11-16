@@ -2,6 +2,7 @@ package com.areumz.devqueue.service;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
+import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,16 @@ public class ArticleService {
         this.articleRepository = articleRepository;
     }
 
-    public Article save(Article article) {
+    public Article findMyArticle(Long id, Long userId) {
+        return articleRepository.findById(id)
+                .filter(article -> article.getUserId().equals(userId))
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Transactional
+    public Article create(Long userId, String title, String url, Category category, String memo) {
+        Article article = new Article(title, url, category, memo);
+        article.setUserId(userId);
         return articleRepository.save(article);
     }
 
@@ -24,20 +34,14 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
-    public Article findOne(Long id) {
-        return articleRepository.findById(id).orElseThrow();
+    @Transactional
+    public void updateMemo(Long id, Long userId, String memo) {
+        findMyArticle(id, userId).changeMemo(memo);
     }
 
     @Transactional
-    public void updateMemo(Long id, String memo) {
-        Article article = articleRepository.findById(id).orElseThrow();
-        article.changeMemo(memo);
-    }
-
-    @Transactional
-    public void toggleRead(Long id) {
-        Article article = articleRepository.findById(id).orElseThrow();
-        article.toggleRead();
+    public void toggleRead(Long id, Long userId) {
+        findMyArticle(id, userId).toggleRead();
     }
 
     public List<Article> findByCategory(Category category) {
@@ -54,14 +58,15 @@ public class ArticleService {
     }
 
     @Transactional
-    public void updateArticle(Long id, String title, String url, Category category) {
-        Article article = articleRepository.findById(id).orElseThrow();
+    public void updateArticle(Long id, Long userId, String title, String url, Category category) {
+        Article article = findMyArticle(id, userId);
         article.changeTitle(title);
         article.changeUrl(url);
         article.changeCategory(category);
     }
 
-    public void deleteArticle(Long id) {
-        articleRepository.deleteById(id);
+    @Transactional
+    public void deleteArticle(Long id, Long userId) {
+        articleRepository.deleteById(findMyArticle(id, userId).getId());
     }
 }
