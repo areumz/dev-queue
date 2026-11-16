@@ -68,14 +68,12 @@
                 </div>
                 <div style="display:flex; gap:6px;">
                     <form th:action="@{/vocabularies/{id}/toggle(id=${vocab.id})}" method="post" style="display:inline;">
-                        <input type="hidden" name="articleId" th:value="${article.id}">
                         <button type="submit" 
                         th:class="${vocab.memorized} ? 'btn-secondary' : 'btn-tint'"
                         style="padding:4px 10px; font-size:12px;" 
                         th:text="${vocab.memorized} ? '암기완료' : '암기중'"></button>
                     </form>
                     <form th:action="@{/vocabularies/{id}/delete(id=${vocab.id})}" method="post" style="display:inline;">
-                        <input type="hidden" name="articleId" th:value="${article.id}">
                         <button type="submit" class="btn-danger" style="padding:4px 10px; font-size:12px;">삭제</button>
                     </form>
                 </div>

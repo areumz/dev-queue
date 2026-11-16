@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     @GetMapping("/")
     public String home() {
-        return "redirect:/articles";   // 미로그인이면 인터셉터가 /login으로 보냄
+        return "redirect:/articles";   // 미로그인이면 Spring Security가 /login으로 보냄
     }
 }

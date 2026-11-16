@@ -5,9 +5,6 @@ import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 @Service
 public class UserService {
@@ -32,22 +29,5 @@ public class UserService {
         // 3. User 생성 및 저장
         User user = new User(username, encodedPassword, nickname, role, roleDetail);
         return userRepository.save(user);
-    }
-
-    public User login(String username, String rawPassword) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다"));
-
-        if(!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.");
-        }
-
-        return user;
-    }
-
-    @Transactional
-    public void updatePopupDate(Long userId, LocalDate date) {
-        User user = userRepository.findById(userId).orElseThrow();
-        user.updatePopupDate(date);
     }
 }

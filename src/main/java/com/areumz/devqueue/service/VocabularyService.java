@@ -1,12 +1,16 @@
 package com.areumz.devqueue.service;
 
 import com.areumz.devqueue.domain.Article;
+import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
+import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.ArticleRepository;
+import com.areumz.devqueue.repository.UserRepository;
 import com.areumz.devqueue.repository.VocabularyRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,31 +19,60 @@ import java.util.List;
 public class VocabularyService {
     private final VocabularyRepository vocabularyRepository;
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
 
     public VocabularyService(VocabularyRepository vocabularyRepository,
-                             ArticleRepository articleRepository) {
+                             ArticleRepository articleRepository,
+                             UserRepository userRepository) {
         this.vocabularyRepository = vocabularyRepository;
         this.articleRepository = articleRepository;
+        this.userRepository = userRepository;
     }
 
-    public Vocabulary addVocabulary(String word, String meaning, Long articleId) {
-        Vocabulary vocabulary = new Vocabulary(word, meaning, articleId);
-        return vocabularyRepository.save(vocabulary);
+    @Transactional
+    public Vocabulary addVocabulary(Long articleId, Long userId, String word, String meaning) {
+        findMyArticle(articleId, userId);
+        return vocabularyRepository.save(new Vocabulary(word, meaning, articleId));
     }
 
-    public List<Vocabulary> findByArticleId(Long articleId) {
+    public List<Vocabulary> findByArticleId(Long articleId, Long userId) {
+        findMyArticle(articleId, userId);
         return vocabularyRepository.findByArticleId(articleId);
     }
 
     @Transactional
-    public void toggleMemorized(Long id) {
-        Vocabulary vocabulary = vocabularyRepository.findById(id).orElseThrow();
+    public Long toggleMemorized(Long id, Long userId) {
+        Vocabulary vocabulary = findMyVocabulary(id, userId);
         vocabulary.toggleMemorized();
+        return vocabulary.getArticleId();
     }
 
     @Transactional
-    public void deleteVocabulary(Long id) {
+    public Long deleteVocabulary(Long id, Long userId) {
+        Vocabulary vocabulary = findMyVocabulary(id, userId);
         vocabularyRepository.deleteById(id);
+        return vocabulary.getArticleId();
+    }
+
+    @Transactional
+    public void memorize(List<Long> ids, Long userId) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        List<Vocabulary> mine = ids.stream().map(id -> findMyVocabulary(id, userId)).toList();
+        mine.forEach(Vocabulary::toggleMemorized);
+    }
+
+    private Article findMyArticle(Long articleId, Long userId) {
+        return articleRepository.findById(articleId)
+                .filter(article -> article.getUserId().equals(userId))
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    private Vocabulary findMyVocabulary(Long id, Long userId) {
+        Vocabulary vocabulary = vocabularyRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        findMyArticle(vocabulary.getArticleId(), userId);
+        return vocabulary;
     }
 
     public List<Vocabulary> findUnmemorizedVocabulariesByUserId(Long userId) {
@@ -65,5 +98,19 @@ public class VocabularyService {
         Collections.shuffle(unmemorized);
         int count = Math.min(3, unmemorized.size());
         return new ArrayList<>(unmemorized.subList(0, count));
+    }
+
+    @Transactional
+    public List<Vocabulary> takeTodayPopupWords(Long userId) {
+        LocalDate today = LocalDate.now();
+        User user = userRepository.findById(userId).orElseThrow();
+        if (today.equals(user.getLastPopupDate())) {
+            return List.of();
+        }
+        List<Vocabulary> words = getRandomUnmemorized(userId);
+        if (!words.isEmpty()) {
+            user.updatePopupDate(today);
+        }
+        return words;
     }
 }

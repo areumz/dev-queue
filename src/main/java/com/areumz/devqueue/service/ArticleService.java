@@ -2,10 +2,14 @@ package com.areumz.devqueue.service;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
+import com.areumz.devqueue.exception.InvalidUrlException;
+import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Service
@@ -16,7 +20,17 @@ public class ArticleService {
         this.articleRepository = articleRepository;
     }
 
-    public Article save(Article article) {
+    public Article findMyArticle(Long id, Long userId) {
+        return articleRepository.findById(id)
+                .filter(article -> article.getUserId().equals(userId))
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Transactional
+    public Article create(Long userId, String title, String url, Category category, String memo) {
+        String stripped = requireHttpUrl(url);
+        Article article = new Article(title, stripped, category, memo);
+        article.setUserId(userId);
         return articleRepository.save(article);
     }
 
@@ -24,20 +38,14 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
-    public Article findOne(Long id) {
-        return articleRepository.findById(id).orElseThrow();
+    @Transactional
+    public void updateMemo(Long id, Long userId, String memo) {
+        findMyArticle(id, userId).changeMemo(memo);
     }
 
     @Transactional
-    public void updateMemo(Long id, String memo) {
-        Article article = articleRepository.findById(id).orElseThrow();
-        article.changeMemo(memo);
-    }
-
-    @Transactional
-    public void toggleRead(Long id) {
-        Article article = articleRepository.findById(id).orElseThrow();
-        article.toggleRead();
+    public void toggleRead(Long id, Long userId) {
+        findMyArticle(id, userId).toggleRead();
     }
 
     public List<Article> findByCategory(Category category) {
@@ -54,14 +62,35 @@ public class ArticleService {
     }
 
     @Transactional
-    public void updateArticle(Long id, String title, String url, Category category) {
-        Article article = articleRepository.findById(id).orElseThrow();
+    public void updateArticle(Long id, Long userId, String title, String url, Category category) {
+        Article article = findMyArticle(id, userId);
+        String stripped = requireHttpUrl(url);
         article.changeTitle(title);
-        article.changeUrl(url);
+        article.changeUrl(stripped);
         article.changeCategory(category);
     }
 
-    public void deleteArticle(Long id) {
-        articleRepository.deleteById(id);
+    @Transactional
+    public void deleteArticle(Long id, Long userId) {
+        articleRepository.deleteById(findMyArticle(id, userId).getId());
+    }
+
+    private static String requireHttpUrl(String rawUrl) {
+        if (rawUrl == null || rawUrl.isBlank()) {
+            throw new InvalidUrlException();
+        }
+        String url = rawUrl.strip();
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            boolean httpScheme = scheme != null
+                    && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme));
+            if (!httpScheme || uri.getHost() == null) {
+                throw new InvalidUrlException();
+            }
+            return url;
+        } catch (URISyntaxException e) {
+            throw new InvalidUrlException();
+        }
     }
 }
