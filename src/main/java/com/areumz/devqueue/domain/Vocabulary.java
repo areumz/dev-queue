@@ -46,6 +46,10 @@ public class Vocabulary {
         return articleId;
     }
 
+    public void markMemorized() {
+        this.memorized = true;
+    }
+
     public void toggleMemorized() {
         this.memorized = !this.memorized;
     }

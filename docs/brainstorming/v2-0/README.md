@@ -6,7 +6,7 @@ v2 기능(API 분리, 확장 프로그램, 추천)을 올리기 전에 바닥을
 | 순서 | 사이클 | 목표 | 상태 |
 |---|---|---|---|
 | a | [테스트 기반](a-test-foundation-brainstorming.md) | 외부 DB 없이 테스트가 돌고, CI가 실패한 PR을 막는다 | 완료 (PR #15) |
-| b | [버그·보안 수정 + 최소 Spring Security](b-security-fixes-brainstorming.md) | 브리프 1장 수정. IDOR 재현 테스트가 첫 작업 | 설계 중 |
+| b | [버그·보안 수정 + 최소 Spring Security](b-security-fixes-brainstorming.md) | 브리프 1장 수정. IDOR 재현 테스트가 첫 작업 | 구현 완료, PR 2 리뷰 대기 |
 | c | 로그인 고도화 | 마이페이지, 비밀번호 찾기(메일), SNS 로그인. 닉네임을 바꾸면 세션의 `LoginUser`도 같이 갱신 | 대기 |
 | d | `user_event` 로그 | 추천·평가에 쓸 행동 기록을 쌓기 시작. 운영 설정 정리(`ddl-auto`, Flyway), `username` 유니크 제약(동시 가입 중복 방지)도 여기서 | 대기 |
 

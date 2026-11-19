@@ -10,6 +10,7 @@ import com.areumz.devqueue.repository.VocabularyRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,13 +21,16 @@ public class VocabularyService {
     private final VocabularyRepository vocabularyRepository;
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final Clock clock;
 
     public VocabularyService(VocabularyRepository vocabularyRepository,
                              ArticleRepository articleRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             Clock clock) {
         this.vocabularyRepository = vocabularyRepository;
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.clock = clock;
     }
 
     @Transactional
@@ -60,12 +64,12 @@ public class VocabularyService {
             return;
         }
         List<Vocabulary> mine = ids.stream().map(id -> findMyVocabulary(id, userId)).toList();
-        mine.forEach(Vocabulary::toggleMemorized);
+        mine.forEach(Vocabulary::markMemorized);
     }
 
     private Article findMyArticle(Long articleId, Long userId) {
         return articleRepository.findById(articleId)
-                .filter(article -> article.getUserId().equals(userId))
+                .filter(article -> userId.equals(article.getUserId()))
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
@@ -76,21 +80,7 @@ public class VocabularyService {
     }
 
     public List<Vocabulary> findUnmemorizedVocabulariesByUserId(Long userId) {
-        List<Article> myArticles = articleRepository.findAll().stream()
-                .filter(article -> article.getUserId().equals(userId))
-                .toList();
-
-        List<Vocabulary> unmemorized = new ArrayList<>();
-
-        for(Article article : myArticles){
-            List<Vocabulary> vocabularies = vocabularyRepository.findByArticleId(article.getId());
-            for(Vocabulary vocabulary : vocabularies){
-                if(!vocabulary.isMemorized()){
-                    unmemorized.add(vocabulary);
-                }
-            }
-        }
-        return unmemorized;
+        return new ArrayList<>(vocabularyRepository.findUnmemorizedByUserId(userId));
     }
 
     public List<Vocabulary> getRandomUnmemorized(Long userId) {
@@ -102,7 +92,7 @@ public class VocabularyService {
 
     @Transactional
     public List<Vocabulary> takeTodayPopupWords(Long userId) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
         User user = userRepository.findById(userId).orElseThrow();
         if (today.equals(user.getLastPopupDate())) {
             return List.of();
