@@ -3,6 +3,7 @@ package com.areumz.devqueue.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
@@ -49,10 +50,13 @@ class ArticleDeleteAndMemorizeTest {
         vocabularyRepository.save(new Vocabulary("b1", "뜻", b.getId()));
 
         mockMvc.perform(post("/articles/" + a.getId() + "/delete")
-                .with(TestAuth.loginAs(alice)).with(csrf()));
+                .with(TestAuth.loginAs(alice)).with(csrf()))
+                .andExpect(status().is3xxRedirection());
         entityManager.flush();
         entityManager.clear();
 
+        assertThat(articleRepository.findById(a.getId())).isEmpty();
+        assertThat(articleRepository.findById(b.getId())).isPresent();
         assertThat(vocabularyRepository.findByArticleId(a.getId())).isEmpty();
         assertThat(vocabularyRepository.findByArticleId(b.getId())).hasSize(1);
     }
@@ -65,10 +69,12 @@ class ArticleDeleteAndMemorizeTest {
         vocabularyRepository.save(new Vocabulary("a1", "뜻", a.getId()));
 
         mockMvc.perform(post("/articles/" + a.getId() + "/delete")
-                .with(TestAuth.loginAs(bob)).with(csrf()));
+                .with(TestAuth.loginAs(bob)).with(csrf()))
+                .andExpect(status().isNotFound());
         entityManager.flush();
         entityManager.clear();
 
+        assertThat(articleRepository.findById(a.getId())).isPresent();
         assertThat(vocabularyRepository.findByArticleId(a.getId())).hasSize(1);
     }
 

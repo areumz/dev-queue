@@ -69,7 +69,7 @@ public class VocabularyService {
 
     private Article findMyArticle(Long articleId, Long userId) {
         return articleRepository.findById(articleId)
-                .filter(article -> article.getUserId().equals(userId))
+                .filter(article -> userId.equals(article.getUserId()))
                 .orElseThrow(ResourceNotFoundException::new);
     }
 

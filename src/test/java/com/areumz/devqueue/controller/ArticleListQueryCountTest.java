@@ -63,7 +63,6 @@ class ArticleListQueryCountTest {
         em.flush();
 
         long queries = stats.getPrepareStatementCount();
-        System.out.println("[query-count] GET /articles with popup = " + queries);
         assertThat(queries).isLessThanOrEqualTo(5);
     }
 

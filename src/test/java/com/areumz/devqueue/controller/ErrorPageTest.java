@@ -49,6 +49,14 @@ class ErrorPageTest {
     }
 
     @Test
+    void articleWithoutOwnerShowsNotFound() throws Exception {
+        Article orphan = articleRepository.save(new Article("t", "https://example.com", Category.AI, null));
+
+        mockMvc.perform(get("/articles/" + orphan.getId()).with(TestAuth.loginAs(alice)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void missingParameterShowsBadRequestPage() throws Exception {
         Article article = new Article("t", "https://example.com", Category.AI, null);
         article.setUserId(alice.getId());

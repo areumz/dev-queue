@@ -61,6 +61,9 @@ class InputValidationTest {
                         .param("nickname", "다른앨리스").param("role", "BACKEND"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("이미 존재하는 아이디입니다.")));
+
+        assertThat(userRepository.findAll().stream().filter(u -> "alice".equals(u.getUsername())).count())
+                .isEqualTo(1);
     }
 
     @Test

@@ -25,7 +25,7 @@ public class ArticleService {
 
     public Article findMyArticle(Long id, Long userId) {
         return articleRepository.findById(id)
-                .filter(article -> article.getUserId().equals(userId))
+                .filter(article -> userId.equals(article.getUserId()))
                 .orElseThrow(ResourceNotFoundException::new);
     }
 

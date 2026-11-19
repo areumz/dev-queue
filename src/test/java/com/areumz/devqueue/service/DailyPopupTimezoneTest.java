@@ -1,7 +1,6 @@
 package com.areumz.devqueue.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
@@ -19,18 +18,11 @@ import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
 @Transactional
 class DailyPopupTimezoneTest {
-
-    @MockitoBean
-    Clock clock;
-
-    @Autowired
-    VocabularyService vocabularyService;
 
     @Autowired
     UserRepository userRepository;
@@ -43,8 +35,9 @@ class DailyPopupTimezoneTest {
 
     @Test
     void dayChangesAtKoreanMidnight() {
-        given(clock.instant()).willReturn(Instant.parse("2026-11-14T15:30:00Z"));
-        given(clock.getZone()).willReturn(ZoneId.of("Asia/Seoul"));
+        Clock clock = Clock.fixed(Instant.parse("2026-11-14T15:30:00Z"), ZoneId.of("Asia/Seoul"));
+        VocabularyService vocabularyService =
+                new VocabularyService(vocabularyRepository, articleRepository, userRepository, clock);
         User alice = new User("alice", "x", "앨리스", Role.BACKEND, null);
         alice.updatePopupDate(LocalDate.of(2026, 11, 14));
         userRepository.save(alice);

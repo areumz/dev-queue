@@ -37,7 +37,7 @@ class ArticleListOwnershipTest {
     VocabularyRepository vocabularyRepository;
 
     @Test
-    void listAndPopupContainOnlyCallersData() throws Exception {
+    void listContainsOnlyCallersArticles() throws Exception {
         User alice = userRepository.save(new User("alice", "x", "앨리스", Role.BACKEND, null));
         User bob = userRepository.save(new User("bob", "x", "밥", Role.BACKEND, null));
         for (int i = 0; i < 10; i++) {
