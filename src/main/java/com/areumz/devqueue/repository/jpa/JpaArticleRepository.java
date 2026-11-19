@@ -1,6 +1,7 @@
 package com.areumz.devqueue.repository.jpa;
 
 import com.areumz.devqueue.domain.Article;
+import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.repository.ArticleRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -31,6 +32,16 @@ public class JpaArticleRepository implements ArticleRepository {
     @Override
     public List<Article> findAll() {
         return springDataJpaArticleRepository.findAll();
+    }
+
+    @Override
+    public List<Article> findByUserId(Long userId) {
+        return springDataJpaArticleRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<Article> findByUserIdAndCategory(Long userId, Category category) {
+        return springDataJpaArticleRepository.findByUserIdAndCategory(userId, category);
     }
 
     @Override

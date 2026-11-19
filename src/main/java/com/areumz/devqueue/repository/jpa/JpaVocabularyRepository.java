@@ -34,6 +34,11 @@ public class JpaVocabularyRepository implements VocabularyRepository {
     }
 
     @Override
+    public List<Vocabulary> findUnmemorizedByUserId(Long userId) {
+        return springDataJpaVocabularyRepository.findUnmemorizedByUserId(userId);
+    }
+
+    @Override
     public void deleteById(Long id) {
         springDataJpaVocabularyRepository.deleteById(id);
     }

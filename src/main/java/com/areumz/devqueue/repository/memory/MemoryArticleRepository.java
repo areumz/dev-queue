@@ -1,6 +1,7 @@
 package com.areumz.devqueue.repository.memory;
 
 import com.areumz.devqueue.domain.Article;
+import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.repository.ArticleRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -33,6 +34,20 @@ public class MemoryArticleRepository implements ArticleRepository {
     @Override
     public List<Article> findAll() {
         return new ArrayList<>(articles.values());
+    }
+
+    @Override
+    public List<Article> findByUserId(Long userId) {
+        return articles.values().stream()
+                .filter(article -> userId.equals(article.getUserId()))
+                .toList();
+    }
+
+    @Override
+    public List<Article> findByUserIdAndCategory(Long userId, Category category) {
+        return findByUserId(userId).stream()
+                .filter(article -> article.getCategory() == category)
+                .toList();
     }
 
     @Override

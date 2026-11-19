@@ -80,21 +80,7 @@ public class VocabularyService {
     }
 
     public List<Vocabulary> findUnmemorizedVocabulariesByUserId(Long userId) {
-        List<Article> myArticles = articleRepository.findAll().stream()
-                .filter(article -> article.getUserId().equals(userId))
-                .toList();
-
-        List<Vocabulary> unmemorized = new ArrayList<>();
-
-        for(Article article : myArticles){
-            List<Vocabulary> vocabularies = vocabularyRepository.findByArticleId(article.getId());
-            for(Vocabulary vocabulary : vocabularies){
-                if(!vocabulary.isMemorized()){
-                    unmemorized.add(vocabulary);
-                }
-            }
-        }
-        return unmemorized;
+        return new ArrayList<>(vocabularyRepository.findUnmemorizedByUserId(userId));
     }
 
     public List<Vocabulary> getRandomUnmemorized(Long userId) {

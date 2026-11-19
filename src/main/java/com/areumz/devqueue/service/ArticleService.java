@@ -55,10 +55,9 @@ public class ArticleService {
     }
 
     public List<Article> findMyArticles(Long userId, Category category) {
-        return articleRepository.findAll().stream()
-                .filter(article->article.getUserId().equals(userId))
-                .filter(article->category==null || article.getCategory() == category )
-                .toList();
+        return category == null
+                ? articleRepository.findByUserId(userId)
+                : articleRepository.findByUserIdAndCategory(userId, category);
     }
 
     @Transactional
