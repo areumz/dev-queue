@@ -5,6 +5,7 @@ import com.areumz.devqueue.domain.Category;
 import com.areumz.devqueue.exception.InvalidUrlException;
 import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.ArticleRepository;
+import com.areumz.devqueue.repository.VocabularyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,11 @@ import java.util.List;
 @Service
 public class ArticleService {
     private final ArticleRepository articleRepository;
+    private final VocabularyRepository vocabularyRepository;
 
-    public ArticleService(ArticleRepository articleRepository) {
+    public ArticleService(ArticleRepository articleRepository, VocabularyRepository vocabularyRepository) {
         this.articleRepository = articleRepository;
+        this.vocabularyRepository = vocabularyRepository;
     }
 
     public Article findMyArticle(Long id, Long userId) {
@@ -71,7 +74,9 @@ public class ArticleService {
 
     @Transactional
     public void deleteArticle(Long id, Long userId) {
-        articleRepository.deleteById(findMyArticle(id, userId).getId());
+        Long articleId = findMyArticle(id, userId).getId();
+        vocabularyRepository.deleteByArticleId(articleId);
+        articleRepository.deleteById(articleId);
     }
 
     private static String requireHttpUrl(String rawUrl) {

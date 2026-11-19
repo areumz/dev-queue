@@ -64,7 +64,7 @@ public class VocabularyService {
             return;
         }
         List<Vocabulary> mine = ids.stream().map(id -> findMyVocabulary(id, userId)).toList();
-        mine.forEach(Vocabulary::toggleMemorized);
+        mine.forEach(Vocabulary::markMemorized);
     }
 
     private Article findMyArticle(Long articleId, Long userId) {
