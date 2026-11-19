@@ -10,6 +10,7 @@ import com.areumz.devqueue.repository.VocabularyRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,13 +21,16 @@ public class VocabularyService {
     private final VocabularyRepository vocabularyRepository;
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final Clock clock;
 
     public VocabularyService(VocabularyRepository vocabularyRepository,
                              ArticleRepository articleRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             Clock clock) {
         this.vocabularyRepository = vocabularyRepository;
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.clock = clock;
     }
 
     @Transactional
@@ -102,7 +106,7 @@ public class VocabularyService {
 
     @Transactional
     public List<Vocabulary> takeTodayPopupWords(Long userId) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
         User user = userRepository.findById(userId).orElseThrow();
         if (today.equals(user.getLastPopupDate())) {
             return List.of();
