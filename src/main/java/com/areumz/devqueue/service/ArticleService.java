@@ -37,10 +37,6 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
-    public List<Article> findArticles() {
-        return articleRepository.findAll();
-    }
-
     @Transactional
     public void updateMemo(Long id, Long userId, String memo) {
         findMyArticle(id, userId).changeMemo(memo);
@@ -49,12 +45,6 @@ public class ArticleService {
     @Transactional
     public void toggleRead(Long id, Long userId) {
         findMyArticle(id, userId).toggleRead();
-    }
-
-    public List<Article> findByCategory(Category category) {
-        return articleRepository.findAll().stream()
-                .filter(article -> article.getCategory() == category)
-                .toList();
     }
 
     public List<Article> findMyArticles(Long userId, Category category) {
