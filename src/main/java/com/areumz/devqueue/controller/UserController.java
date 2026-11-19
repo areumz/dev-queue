@@ -19,10 +19,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    @ModelAttribute("roles")
+    public Role[] roles() {
+        return Role.values();
+    }
+
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("signupForm", new SignupForm());
-        model.addAttribute("roles", Role.values());
         return "signup";
     }
 
@@ -33,7 +37,12 @@ public class UserController {
             return "signup";
         }
 
-        userService.signup(form.getUsername(), form.getPassword(), form.getNickname(), form.getRole(), form.getRoleDetail());
+        try {
+            userService.signup(form.getUsername(), form.getPassword(), form.getNickname(), form.getRole(), form.getRoleDetail());
+        } catch (IllegalStateException e) {
+            bindingResult.rejectValue("username", "duplicate", e.getMessage());
+            return "signup";
+        }
         redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다. 로그인해주세요!");
         return "redirect:/login";
     }

@@ -82,7 +82,7 @@ public class ArticleController {
 
     @PostMapping("/articles/{id}/edit")
     public String edit(@PathVariable Long id, @RequestParam String title,
-                       @RequestParam String url, Category category,
+                       @RequestParam String url, @RequestParam Category category,
                        Model model, @AuthenticationPrincipal LoginUser loginUser) {
         try {
             articleService.updateArticle(id, loginUser.getId(), title, url, category);
