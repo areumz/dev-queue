@@ -1,10 +1,13 @@
 package com.areumz.devqueue.controller;
 
 import com.areumz.devqueue.auth.LoginUser;
+import com.areumz.devqueue.auth.LoginUserRefresher;
 import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.exception.DuplicateEmailException;
 import com.areumz.devqueue.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,8 +23,11 @@ public class MyPageController {
 
     private final UserService userService;
 
-    public MyPageController(UserService userService) {
+    private final LoginUserRefresher loginUserRefresher;
+
+    public MyPageController(UserService userService, LoginUserRefresher loginUserRefresher) {
         this.userService = userService;
+        this.loginUserRefresher = loginUserRefresher;
     }
 
     @ModelAttribute("roles")
@@ -42,19 +48,22 @@ public class MyPageController {
     public String update(@Valid @ModelAttribute("myPageForm") MyPageForm form,
                          BindingResult bindingResult, Model model,
                          @AuthenticationPrincipal LoginUser loginUser,
-                         RedirectAttributes redirectAttributes) {
+                         RedirectAttributes redirectAttributes,
+                         HttpServletRequest request, HttpServletResponse response) {
         model.addAttribute("loginUser", loginUser);
         model.addAttribute("username", loginUser.getUsername());
         if (bindingResult.hasErrors()) {
             return "mypage";
         }
+        User saved;
         try {
-            userService.updateProfile(loginUser.getId(), form.getNickname(), form.getRole(),
+            saved = userService.updateProfile(loginUser.getId(), form.getNickname(), form.getRole(),
                     form.getRoleDetail(), form.getEmail());
         } catch (DuplicateEmailException e) {
             bindingResult.rejectValue("email", "duplicate", e.getMessage());
             return "mypage";
         }
+        loginUserRefresher.refresh(saved, request, response);
         redirectAttributes.addFlashAttribute("message", "정보를 저장했어요.");
         return "redirect:/mypage";
     }
