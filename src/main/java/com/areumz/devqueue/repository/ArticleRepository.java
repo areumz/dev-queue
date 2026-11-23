@@ -13,4 +13,5 @@ public interface ArticleRepository {
     List<Article> findByUserId(Long userId);
     List<Article> findByUserIdAndCategory(Long userId, Category category);
     void deleteById(Long id);
+    void deleteByUserId(Long userId);
 }

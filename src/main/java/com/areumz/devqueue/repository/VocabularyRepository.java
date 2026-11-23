@@ -12,4 +12,5 @@ public interface VocabularyRepository {
     List<Vocabulary> findUnmemorizedByUserId(Long userId);
     void deleteById(Long id);
     void deleteByArticleId(Long articleId);
+    void deleteByUserId(Long userId);
 }

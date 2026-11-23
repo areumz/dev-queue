@@ -6,7 +6,9 @@ import com.areumz.devqueue.exception.DuplicateEmailException;
 import com.areumz.devqueue.exception.DuplicateUsernameException;
 import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.exception.WrongPasswordException;
+import com.areumz.devqueue.repository.ArticleRepository;
 import com.areumz.devqueue.repository.UserRepository;
+import com.areumz.devqueue.repository.VocabularyRepository;
 import java.util.Locale;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final ArticleRepository articleRepository;
+    private final VocabularyRepository vocabularyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ArticleRepository articleRepository,
+                       VocabularyRepository vocabularyRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.articleRepository = articleRepository;
+        this.vocabularyRepository = vocabularyRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -68,6 +75,17 @@ public class UserService {
             throw new WrongPasswordException();
         }
         user.changePassword(passwordEncoder.encode(newPassword));
+    }
+
+    @Transactional
+    public void withdraw(Long userId, String rawPassword) {
+        User user = getUser(userId);
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new WrongPasswordException();   // 아무것도 지우기 전에 막는다
+        }
+        vocabularyRepository.deleteByUserId(userId);   // 단어 -> 글 -> 계정 순서
+        articleRepository.deleteByUserId(userId);
+        userRepository.deleteById(userId);
     }
 
     /** ownUserId: 수정 중인 본인 id. 가입이면 null. 본인의 기존 이메일은 중복으로 보지 않는다. */

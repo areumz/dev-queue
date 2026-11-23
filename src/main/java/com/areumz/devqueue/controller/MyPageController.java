@@ -10,13 +10,16 @@ import com.areumz.devqueue.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -95,5 +98,27 @@ public class MyPageController {
         request.changeSessionId();
         redirectAttributes.addFlashAttribute("message", "비밀번호를 바꿨어요.");
         return "redirect:/mypage";
+    }
+
+
+    @GetMapping("/mypage/withdraw")
+    public String withdrawForm(Model model, @AuthenticationPrincipal LoginUser loginUser) {
+        model.addAttribute("loginUser", loginUser);
+        return "withdraw";
+    }
+
+    @PostMapping("/mypage/withdraw")
+    public String withdraw(@RequestParam(defaultValue = "") String password, Model model,
+                           @AuthenticationPrincipal LoginUser loginUser, Authentication authentication,
+                           HttpServletRequest request, HttpServletResponse response) {
+        try {
+            userService.withdraw(loginUser.getId(), password);
+        } catch (WrongPasswordException e) {
+            model.addAttribute("loginUser", loginUser);
+            model.addAttribute("error", e.getMessage());
+            return "withdraw";
+        }
+        new SecurityContextLogoutHandler().logout(request, response, authentication);   // 세션을 끊는다
+        return "redirect:/login?withdrawn";   // 세션이 끊겨서 플래시 메시지를 못 쓴다
     }
 }

@@ -41,4 +41,9 @@ public class JpaUserRepository implements UserRepository {
     public List<User> findAll() {
         return springDataJpaUserRepository.findAll();
     }
+
+    @Override
+    public void deleteById(Long id) {
+        springDataJpaUserRepository.deleteById(id);
+    }
 }

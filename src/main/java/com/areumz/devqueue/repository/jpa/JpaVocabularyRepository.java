@@ -47,4 +47,9 @@ public class JpaVocabularyRepository implements VocabularyRepository {
     public void deleteByArticleId(Long articleId) {
         springDataJpaVocabularyRepository.deleteByArticleId(articleId);
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        springDataJpaVocabularyRepository.deleteByUserId(userId);
+    }
 }

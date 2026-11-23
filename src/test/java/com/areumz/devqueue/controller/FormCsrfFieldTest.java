@@ -90,6 +90,11 @@ class FormCsrfFieldTest {
         assertEveryFormHasCsrfField(html("/mypage/password", true));
     }
 
+    @Test
+    void withdrawFormHasCsrfFields() throws Exception {
+        assertEveryFormHasCsrfField(html("/mypage/withdraw", true));
+    }
+
     private String html(String path, boolean login) throws Exception {
         var request = get(path);
         if (login) {
