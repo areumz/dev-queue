@@ -17,7 +17,6 @@ public interface SpringDataJpaVocabularyRepository extends JpaRepository<Vocabul
             + "and v.articleId in (select a.id from Article a where a.userId = :userId)")
     List<Vocabulary> findUnmemorizedByUserId(@Param("userId") Long userId);
 
-
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from Vocabulary v where v.articleId in "
             + "(select a.id from Article a where a.userId = :userId)")

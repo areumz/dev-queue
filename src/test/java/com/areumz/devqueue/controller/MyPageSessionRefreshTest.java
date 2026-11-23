@@ -30,8 +30,10 @@ class MyPageSessionRefreshTest {
     @Autowired
     UserService userService;
 
+    private Long aliceId;
+
     private MockHttpSession loginAsAlice() throws Exception {
-        userService.signup("alice", "password123", "앨리스", Role.BACKEND, null, null);
+        aliceId = userService.signup("alice", "password123", "앨리스", Role.BACKEND, null, null).getId();
         return (MockHttpSession) mockMvc.perform(post("/login").with(csrf())
                         .param("username", "alice").param("password", "password123"))
                 .andReturn().getRequest().getSession();
@@ -54,10 +56,12 @@ class MyPageSessionRefreshTest {
     void refreshedSessionUserHasNoPasswordAndSameIdentity() throws Exception {
         MockHttpSession session = loginAsAlice();
         mockMvc.perform(post("/mypage").session(session).with(csrf())
-                .param("nickname", "새닉네임").param("role", "BACKEND"));
+                .param("nickname", "새닉네임").param("role", "BACKEND"))
+                .andExpect(redirectedUrl("/mypage"));
 
         SecurityContext ctx = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
         LoginUser principal = (LoginUser) ctx.getAuthentication().getPrincipal();
+        assertThat(principal.getId()).isEqualTo(aliceId);
         assertThat(principal.getUsername()).isEqualTo("alice");
         assertThat(principal.getNickname()).isEqualTo("새닉네임");
         assertThat(principal.getPassword()).isNull();

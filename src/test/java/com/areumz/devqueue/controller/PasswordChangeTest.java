@@ -13,6 +13,7 @@ import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.repository.UserRepository;
 import com.areumz.devqueue.service.UserService;
 import com.areumz.devqueue.support.IntegrationTest;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ class PasswordChangeTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    EntityManager em;
 
     @BeforeEach
     void setUp() {
@@ -63,6 +67,8 @@ class PasswordChangeTest {
     void successLetsNewPasswordLoginAndBlocksOldOne() throws Exception {
         change(login("password123"), "password123", "newpassword456")
                 .andExpect(redirectedUrl("/mypage"));
+        em.flush();
+        em.clear();
 
         mockMvc.perform(post("/login").with(csrf())
                         .param("username", "alice").param("password", "newpassword456"))
@@ -104,6 +110,16 @@ class PasswordChangeTest {
         change(login("password123"), "password123", "가".repeat(25))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("72바이트")));
+        assertThat(storedHash()).isEqualTo(before);
+    }
+
+    @Test
+    void postWithoutCsrfIsForbiddenAndChangesNothing() throws Exception {
+        MockHttpSession session = login("password123");
+        String before = storedHash();
+        mockMvc.perform(post("/mypage/password").session(session)
+                        .param("currentPassword", "password123").param("newPassword", "newpassword456"))
+                .andExpect(status().isForbidden());
         assertThat(storedHash()).isEqualTo(before);
     }
 

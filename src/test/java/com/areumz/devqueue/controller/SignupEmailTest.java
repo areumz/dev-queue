@@ -68,6 +68,14 @@ class SignupEmailTest {
     }
 
     @Test
+    void tooLongEmailIsRejected() throws Exception {
+        signup("carol", "password123", "a".repeat(250) + "@x.com")
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("이메일은 255자 이하로 입력해 주세요.")));
+        assertThat(userRepository.findByUsername("carol")).isEmpty();
+    }
+
+    @Test
     void sevenCharPasswordIsRejected() throws Exception {
         signup("carol", "1234567", "")
                 .andExpect(status().isOk())

@@ -93,7 +93,7 @@ public class VocabularyService {
     @Transactional
     public List<Vocabulary> takeTodayPopupWords(Long userId) {
         LocalDate today = LocalDate.now(clock);
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(ResourceNotFoundException::new);
         if (today.equals(user.getLastPopupDate())) {
             return List.of();
         }

@@ -64,7 +64,7 @@ public class UserService {
         User user = getUser(userId);
         String normalizedEmail = normalizeEmail(email);
         checkEmailAvailable(normalizedEmail, userId);
-        user.updateProfile(nickname, role, roleDetail, normalizedEmail);
+        user.updateProfile(nickname, role, role == Role.ETC ? roleDetail : null, normalizedEmail);
         return user;
     }
 
@@ -81,7 +81,7 @@ public class UserService {
     public void withdraw(Long userId, String rawPassword) {
         User user = getUser(userId);
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new WrongPasswordException();   // 아무것도 지우기 전에 막는다
+            throw new WrongPasswordException();
         }
         vocabularyRepository.deleteByUserId(userId);   // 단어 -> 글 -> 계정 순서
         articleRepository.deleteByUserId(userId);

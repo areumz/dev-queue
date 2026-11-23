@@ -100,7 +100,6 @@ public class MyPageController {
         return "redirect:/mypage";
     }
 
-
     @GetMapping("/mypage/withdraw")
     public String withdrawForm(Model model, @AuthenticationPrincipal LoginUser loginUser) {
         model.addAttribute("loginUser", loginUser);
@@ -118,7 +117,7 @@ public class MyPageController {
             model.addAttribute("error", e.getMessage());
             return "withdraw";
         }
-        new SecurityContextLogoutHandler().logout(request, response, authentication);   // 세션을 끊는다
-        return "redirect:/login?withdrawn";   // 세션이 끊겨서 플래시 메시지를 못 쓴다
+        new SecurityContextLogoutHandler().logout(request, response, authentication);   // 세션 끊음
+        return "redirect:/login?withdrawn";   // 세션이 끊겨서 플래시 메시지를 못 씀
     }
 }

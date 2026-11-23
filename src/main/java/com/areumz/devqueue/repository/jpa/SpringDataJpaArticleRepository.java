@@ -14,7 +14,6 @@ public interface SpringDataJpaArticleRepository extends JpaRepository<Article, L
 
     List<Article> findByUserIdAndCategory(Long userId, Category category);
 
-
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from Article a where a.userId = :userId")
     void deleteByUserId(@Param("userId") Long userId);

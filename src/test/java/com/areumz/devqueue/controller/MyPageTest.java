@@ -16,6 +16,7 @@ import com.areumz.devqueue.support.IntegrationTest;
 import com.areumz.devqueue.support.TestAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,6 +31,9 @@ class MyPageTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    EntityManager em;
 
     User alice;
     User bob;
@@ -54,7 +58,7 @@ class MyPageTest {
     void formShowsCurrentValues() throws Exception {
         mockMvc.perform(get("/mypage").with(TestAuth.loginAs(alice)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("alice")))
+                .andExpect(content().string(containsString("value=\"alice\"")))
                 .andExpect(content().string(containsString("앨리스")))
                 .andExpect(content().string(containsString("alice@x.com")));
     }
@@ -62,6 +66,8 @@ class MyPageTest {
     @Test
     void updateChangesNicknameRoleAndNormalizedEmail() throws Exception {
         update(alice, "새닉", "FRONTEND", " New@X.com ").andExpect(redirectedUrl("/mypage"));
+        em.flush();
+        em.clear();
         User saved = userRepository.findById(alice.getId()).orElseThrow();
         assertThat(saved.getNickname()).isEqualTo("새닉");
         assertThat(saved.getRole()).isEqualTo(Role.FRONTEND);
@@ -106,10 +112,44 @@ class MyPageTest {
     }
 
     @Test
+    void roleDetailIsKeptOnlyForEtc() throws Exception {
+        alice.updateProfile("앨리스", Role.ETC, "X", "alice@x.com");
+        mockMvc.perform(post("/mypage").with(TestAuth.loginAs(alice)).with(csrf())
+                .param("nickname", "앨리스").param("role", "ETC").param("roleDetail", "Y")
+                .param("email", "alice@x.com")).andExpect(redirectedUrl("/mypage"));
+        assertThat(userRepository.findById(alice.getId()).orElseThrow().getRoleDetail()).isEqualTo("Y");
+
+        mockMvc.perform(post("/mypage").with(TestAuth.loginAs(alice)).with(csrf())
+                .param("nickname", "앨리스").param("role", "BACKEND").param("roleDetail", "X")
+                .param("email", "alice@x.com")).andExpect(redirectedUrl("/mypage"));
+        assertThat(userRepository.findById(alice.getId()).orElseThrow().getRoleDetail()).isNull();
+    }
+
+    @Test
+    void tooLongEmailIsRejected() throws Exception {
+        update(alice, "새닉", "BACKEND", "a".repeat(250) + "@x.com")
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("이메일은 255자 이하로 입력해 주세요.")));
+        em.flush();
+        em.clear();
+        User saved = userRepository.findById(alice.getId()).orElseThrow();
+        assertThat(saved.getNickname()).isEqualTo("앨리스");
+        assertThat(saved.getEmail()).isEqualTo("alice@x.com");
+    }
+
+    @Test
     void postWithoutCsrfIsForbidden() throws Exception {
         mockMvc.perform(post("/mypage").with(TestAuth.loginAs(alice))
                         .param("nickname", "새닉").param("role", "BACKEND"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void articleListOfDeletedUserGetsNotFound() throws Exception {
+        User ghost = new User("ghost", "x", "유령", Role.BACKEND, null);
+        ghost.setId(999_999L);
+        mockMvc.perform(get("/articles").with(TestAuth.loginAs(ghost)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
