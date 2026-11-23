@@ -5,6 +5,7 @@ import com.areumz.devqueue.auth.LoginUserRefresher;
 import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.exception.DuplicateEmailException;
+import com.areumz.devqueue.exception.WrongPasswordException;
 import com.areumz.devqueue.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -65,6 +66,34 @@ public class MyPageController {
         }
         loginUserRefresher.refresh(saved, request, response);
         redirectAttributes.addFlashAttribute("message", "정보를 저장했어요.");
+        return "redirect:/mypage";
+    }
+
+    @GetMapping("/mypage/password")
+    public String passwordForm(Model model, @AuthenticationPrincipal LoginUser loginUser) {
+        model.addAttribute("passwordChangeForm", new PasswordChangeForm());
+        model.addAttribute("loginUser", loginUser);
+        return "passwordChange";
+    }
+
+    @PostMapping("/mypage/password")
+    public String changePassword(@Valid @ModelAttribute("passwordChangeForm") PasswordChangeForm form,
+                                 BindingResult bindingResult, Model model,
+                                 @AuthenticationPrincipal LoginUser loginUser,
+                                 HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        model.addAttribute("loginUser", loginUser);
+        if (bindingResult.hasErrors()) {
+            return "passwordChange";
+        }
+        try {
+            userService.changePassword(loginUser.getId(), form.getCurrentPassword(), form.getNewPassword());
+        } catch (WrongPasswordException e) {
+            bindingResult.rejectValue("currentPassword", "wrong", e.getMessage());
+            return "passwordChange";
+        }
+        // 현재 브라우저의 세션 ID만 새로 발급한다(다른 기기 세션은 유지: 알려진 한계)
+        request.changeSessionId();
+        redirectAttributes.addFlashAttribute("message", "비밀번호를 바꿨어요.");
         return "redirect:/mypage";
     }
 }

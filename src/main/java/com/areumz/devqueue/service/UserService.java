@@ -5,6 +5,7 @@ import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.exception.DuplicateEmailException;
 import com.areumz.devqueue.exception.DuplicateUsernameException;
 import com.areumz.devqueue.exception.ResourceNotFoundException;
+import com.areumz.devqueue.exception.WrongPasswordException;
 import com.areumz.devqueue.repository.UserRepository;
 import java.util.Locale;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,6 +59,15 @@ public class UserService {
         checkEmailAvailable(normalizedEmail, userId);
         user.updateProfile(nickname, role, roleDetail, normalizedEmail);
         return user;
+    }
+
+    @Transactional
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = getUser(userId);
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new WrongPasswordException();
+        }
+        user.changePassword(passwordEncoder.encode(newPassword));
     }
 
     /** ownUserId: 수정 중인 본인 id. 가입이면 null. 본인의 기존 이메일은 중복으로 보지 않는다. */

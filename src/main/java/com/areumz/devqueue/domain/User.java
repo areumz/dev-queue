@@ -86,4 +86,8 @@ public class User {
         this.roleDetail = roleDetail;
         this.email = email;
     }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
