@@ -24,6 +24,11 @@
                 <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
             </div>
             <div style="margin-bottom:14px;">
+                <input type="text" th:field="*{email}" placeholder="이메일 (선택)">
+                <p style="font-size:12px; color:#888; margin-top:4px;">등록하지 않으면 비밀번호를 잊었을 때 되찾기 어려워요.</p>
+                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
+            </div>
+            <div style="margin-bottom:14px;">
                 <label style="font-size:13px; color:#888; display:block; margin-bottom:8px; padding-left:10px;">직종</label>
                 <div style="display:flex; flex-direction:column; gap:8px; padding-left:10px;">
                     <div th:each="r : ${roles}" style="display:flex; align-items:center; gap:8px; font-size:14px; margin-bottom:8px;">

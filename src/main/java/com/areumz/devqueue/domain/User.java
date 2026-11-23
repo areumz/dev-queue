@@ -20,16 +20,24 @@ public class User {
 
     private String roleDetail;
 
+    private String email;
+
     protected User() {
     }
 
     public User(String username, String password, String nickname,
                 Role role, String roleDetail) {
+        this(username, password, nickname, role, roleDetail, null);
+    }
+
+    public User(String username, String password, String nickname,
+                Role role, String roleDetail, String email) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.role = role;
         this.roleDetail = roleDetail;
+        this.email = email;
     }
 
     public Long getId() {
@@ -54,6 +62,10 @@ public class User {
 
     public String getRoleDetail() {
         return roleDetail;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public LocalDate getLastPopupDate() {

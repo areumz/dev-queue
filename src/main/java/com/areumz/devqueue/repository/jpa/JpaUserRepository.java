@@ -33,6 +33,11 @@ public class JpaUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return springDataJpaUserRepository.findByEmail(email);
+    }
+
+    @Override
     public List<User> findAll() {
         return springDataJpaUserRepository.findAll();
     }

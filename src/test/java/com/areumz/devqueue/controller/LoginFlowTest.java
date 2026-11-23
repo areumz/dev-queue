@@ -43,7 +43,7 @@ class LoginFlowTest {
 
     @BeforeEach
     void setUp() {
-        userService.signup("alice", "password123", "앨리스", Role.BACKEND, null);
+        userService.signup("alice", "password123", "앨리스", Role.BACKEND, null, null);
     }
 
     @Test

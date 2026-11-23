@@ -1,6 +1,8 @@
 package com.areumz.devqueue.controller;
 
 import com.areumz.devqueue.domain.Role;
+import com.areumz.devqueue.exception.DuplicateEmailException;
+import com.areumz.devqueue.exception.DuplicateUsernameException;
 import com.areumz.devqueue.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -38,9 +40,13 @@ public class UserController {
         }
 
         try {
-            userService.signup(form.getUsername(), form.getPassword(), form.getNickname(), form.getRole(), form.getRoleDetail());
-        } catch (IllegalStateException e) {
+            userService.signup(form.getUsername(), form.getPassword(), form.getNickname(),
+                    form.getRole(), form.getRoleDetail(), form.getEmail());
+        } catch (DuplicateUsernameException e) {
             bindingResult.rejectValue("username", "duplicate", e.getMessage());
+            return "signup";
+        } catch (DuplicateEmailException e) {
+            bindingResult.rejectValue("email", "duplicate", e.getMessage());
             return "signup";
         }
         redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다. 로그인해주세요!");

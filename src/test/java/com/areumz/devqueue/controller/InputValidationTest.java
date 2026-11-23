@@ -57,7 +57,7 @@ class InputValidationTest {
     @Test
     void duplicateUsernameShowsMessage() throws Exception {
         mockMvc.perform(post("/signup").with(csrf())
-                        .param("username", "alice").param("password", "pw1234")
+                        .param("username", "alice").param("password", "password123")
                         .param("nickname", "다른앨리스").param("role", "BACKEND"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("이미 존재하는 아이디입니다.")));
