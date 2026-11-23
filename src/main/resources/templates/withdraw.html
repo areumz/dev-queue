@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container-wide">
+    <div class="card" style="max-width:420px; margin:0 auto;">
+        <h2 style="margin-bottom:12px;">회원 탈퇴</h2>
+        <p style="color:#C0392B; font-size:13px; margin-bottom:12px;">탈퇴하면 내 글과 단어가 모두 삭제되고 되돌릴 수 없어요.</p>
+
+        <form th:action="@{/mypage/withdraw}" method="post">
+            <input type="password" name="password" placeholder="비밀번호 확인" style="margin-bottom:8px;">
+            <p th:if="${error}" th:text="${error}" style="color:#C0392B; font-size:12px; margin-bottom:8px;"></p>
+            <button type="submit" class="btn-primary" style="width:100%;">탈퇴하기</button>
+        </form>
+        <p style="margin-top:12px;"><a th:href="@{/mypage}">마이페이지로 돌아가기</a></p>
+    </div>
+</div>
+</body>
+</html>

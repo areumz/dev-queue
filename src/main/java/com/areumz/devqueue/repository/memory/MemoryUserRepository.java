@@ -37,11 +37,23 @@ public class MemoryUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return users.values().stream()
+                .filter(user -> email.equals(user.getEmail()))
+                .findFirst();
+    }
+
+    @Override
     public List<User> findAll() {
         return new ArrayList<>(users.values());
     }
 
     public void clearUsers() {
         users.clear();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        users.remove(id);
     }
 }

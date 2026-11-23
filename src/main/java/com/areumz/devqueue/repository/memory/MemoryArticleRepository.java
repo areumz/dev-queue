@@ -55,6 +55,11 @@ public class MemoryArticleRepository implements ArticleRepository {
         articles.remove(id);
     }
 
+    @Override
+    public void deleteByUserId(Long userId) {
+        articles.values().removeIf(article -> userId.equals(article.getUserId()));
+    }
+
     public void clearArticles() {
         articles.clear();
     }

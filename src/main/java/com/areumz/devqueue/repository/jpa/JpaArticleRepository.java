@@ -48,4 +48,9 @@ public class JpaArticleRepository implements ArticleRepository {
     public void deleteById(Long id) {
         springDataJpaArticleRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        springDataJpaArticleRepository.deleteByUserId(userId);
+    }
 }

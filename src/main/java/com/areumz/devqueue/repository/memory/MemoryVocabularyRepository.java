@@ -63,4 +63,12 @@ public class MemoryVocabularyRepository implements VocabularyRepository {
     public void deleteByArticleId(Long articleId) {
         vocabularies.values().removeIf(vocabulary -> vocabulary.getArticleId().equals(articleId));
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        Set<Long> myArticleIds = articleRepository.findByUserId(userId).stream()
+                .map(Article::getId)
+                .collect(Collectors.toSet());
+        vocabularies.values().removeIf(vocabulary -> myArticleIds.contains(vocabulary.getArticleId()));
+    }
 }

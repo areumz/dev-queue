@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container-wide">
+    <div class="card" style="max-width:420px; margin:0 auto;">
+        <h2 style="margin-bottom:12px;">내 정보</h2>
+        <p th:if="${message}" th:text="${message}" style="color:#3B6D11; font-size:13px; margin-bottom:12px;"></p>
+
+        <form th:action="@{/mypage}" th:object="${myPageForm}" method="post">
+            <div style="margin-bottom:8px;">
+                <label style="font-size:13px; color:#888;">아이디 (바꿀 수 없어요)</label>
+                <input type="text" th:value="${username}" readonly>
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:13px; color:#888;">닉네임</label>
+                <input type="text" th:field="*{nickname}">
+                <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
+            </div>
+            <div style="margin-bottom:14px;">
+                <label style="font-size:13px; color:#888;">이메일 (선택)</label>
+                <input type="text" th:field="*{email}">
+                <p style="font-size:12px; color:#888; margin-top:4px;">등록하지 않으면 비밀번호를 잊었을 때 되찾기 어려워요.</p>
+                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:#C0392B; font-size:12px; margin-top:4px;"></p>
+            </div>
+            <div style="margin-bottom:14px;">
+                <label style="font-size:13px; color:#888; display:block; margin-bottom:8px;">직종</label>
+                <div th:each="r : ${roles}" style="display:flex; align-items:center; gap:8px; font-size:14px; margin-bottom:8px;">
+                    <input type="radio" name="role" th:value="${r}" th:id="${'role-' + r}" th:checked="${myPageForm.role == r}">
+                    <label th:for="${'role-' + r}" th:text="${r.label}"></label>
+                </div>
+                <input type="text" name="roleDetail" id="roleDetailInput" th:value="${myPageForm.roleDetail}" placeholder="직접 입력"
+                       th:style="${myPageForm.role == T(com.areumz.devqueue.domain.Role).ETC} ? 'display:block;' : 'display:none;'">
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;">저장</button>
+        </form>
+    </div>
+    <p style="margin-top:12px; text-align:center;"><a th:href="@{/mypage/password}">비밀번호 변경</a></p>
+    <p style="margin-top:4px; text-align:center;"><a th:href="@{/mypage/withdraw}">회원 탈퇴</a></p>
+</div>
+<script>
+    document.querySelectorAll('input[name="role"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.getElementById('roleDetailInput').style.display =
+                radio.value === 'ETC' ? 'block' : 'none';
+        });
+    });
+</script>
+</body>
+</html>
