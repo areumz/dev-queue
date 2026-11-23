@@ -60,6 +60,10 @@ public class User {
         return nickname;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
     public String getRoleDetail() {
         return roleDetail;
     }
@@ -74,5 +78,12 @@ public class User {
 
     public void updatePopupDate(LocalDate date) {
         this.lastPopupDate = date;
+    }
+
+    public void updateProfile(String nickname, Role role, String roleDetail, String email) {
+        this.nickname = nickname;
+        this.role = role;
+        this.roleDetail = roleDetail;
+        this.email = email;
     }
 }

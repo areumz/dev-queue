@@ -4,10 +4,12 @@ import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.exception.DuplicateEmailException;
 import com.areumz.devqueue.exception.DuplicateUsernameException;
+import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.repository.UserRepository;
 import java.util.Locale;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -43,6 +45,19 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         return userRepository.save(
                 new User(username, encodedPassword, nickname, role, roleDetail, normalizedEmail));
+    }
+
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Transactional
+    public User updateProfile(Long userId, String nickname, Role role, String roleDetail, String email) {
+        User user = getUser(userId);
+        String normalizedEmail = normalizeEmail(email);
+        checkEmailAvailable(normalizedEmail, userId);
+        user.updateProfile(nickname, role, roleDetail, normalizedEmail);
+        return user;
     }
 
     /** ownUserId: 수정 중인 본인 id. 가입이면 null. 본인의 기존 이메일은 중복으로 보지 않는다. */
