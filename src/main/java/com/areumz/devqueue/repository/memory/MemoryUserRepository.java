@@ -37,10 +37,10 @@ public class MemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public List<User> findVerifiedByEmail(String email) {
         return users.values().stream()
-                .filter(user -> email.equals(user.getEmail()))
-                .findFirst();
+                .filter(user -> user.isEmailVerified() && email.equals(user.getEmail()))
+                .toList();
     }
 
     @Override

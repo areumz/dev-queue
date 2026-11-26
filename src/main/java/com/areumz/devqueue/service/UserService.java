@@ -2,7 +2,6 @@ package com.areumz.devqueue.service;
 
 import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
-import com.areumz.devqueue.exception.DuplicateEmailException;
 import com.areumz.devqueue.exception.DuplicateUsernameException;
 import com.areumz.devqueue.exception.ResourceNotFoundException;
 import com.areumz.devqueue.exception.WrongPasswordException;
@@ -20,16 +19,19 @@ public class UserService {
     private final ArticleRepository articleRepository;
     private final VocabularyRepository vocabularyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     public UserService(UserRepository userRepository, ArticleRepository articleRepository,
-                       VocabularyRepository vocabularyRepository, PasswordEncoder passwordEncoder) {
+                       VocabularyRepository vocabularyRepository, PasswordEncoder passwordEncoder,
+                       TokenService tokenService) {
         this.userRepository = userRepository;
         this.articleRepository = articleRepository;
         this.vocabularyRepository = vocabularyRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
     }
 
-    /** The one place email is cleaned: trim, lowercase, blank becomes null. */
+    /** 이메일 정규화 */
     public static String normalizeEmail(String raw) {
         if (raw == null) {
             return null;
@@ -45,27 +47,27 @@ public class UserService {
             throw new DuplicateUsernameException();
         }
 
-        // 2. 이메일 정리 + 중복 체크 (이메일이 없으면 검사하지 않는다)
-        String normalizedEmail = normalizeEmail(email);
-        checkEmailAvailable(normalizedEmail, null);
-
-        // 3. 비밀번호 암호화 후 저장
+        // 2. 비밀번호 암호화 후 저장. 이메일은 중복을 검사하지 않는다(인증할 때 검사).
         String encodedPassword = passwordEncoder.encode(rawPassword);
         return userRepository.save(
-                new User(username, encodedPassword, nickname, role, roleDetail, normalizedEmail));
+                new User(username, encodedPassword, nickname, role, roleDetail, normalizeEmail(email)));
     }
 
     public User getUser(Long id) {
         return userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
+    /** 이메일이 바뀌었으면 true. 이메일 중복은 여기서 검사하지 않는다(인증할 때 검사). */
     @Transactional
-    public User updateProfile(Long userId, String nickname, Role role, String roleDetail, String email) {
+    public boolean updateProfile(Long userId, String nickname, Role role, String roleDetail, String email) {
         User user = getUser(userId);
-        String normalizedEmail = normalizeEmail(email);
-        checkEmailAvailable(normalizedEmail, userId);
-        user.updateProfile(nickname, role, role == Role.ETC ? roleDetail : null, normalizedEmail);
-        return user;
+        boolean emailChanged = user.updateProfile(nickname, role, role == Role.ETC ? roleDetail : null,
+                normalizeEmail(email));
+        if (emailChanged) {
+            // 이전 주소로 보낸 인증 링크와 재설정 링크는 이메일 변경과 같은 트랜잭션에서 함께 죽여야함(사이에 끼어들어 새 주소를 인증하는 경쟁 방지)
+            tokenService.invalidateAllOpen(userId);
+        }
+        return emailChanged;
     }
 
     @Transactional
@@ -75,6 +77,7 @@ public class UserService {
             throw new WrongPasswordException();
         }
         user.changePassword(passwordEncoder.encode(newPassword));
+        tokenService.invalidateAllOpen(userId);   // 열려 있는 재설정 링크로 방금 바꾼 비밀번호를 덮어쓰지 못하게
     }
 
     @Transactional
@@ -83,20 +86,9 @@ public class UserService {
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new WrongPasswordException();
         }
-        vocabularyRepository.deleteByUserId(userId);   // 단어 -> 글 -> 계정 순서
+        vocabularyRepository.deleteByUserId(userId);   // 단어 -> 글 -> 토큰 -> 계정 순서
         articleRepository.deleteByUserId(userId);
+        tokenService.deleteAllOf(userId);
         userRepository.deleteById(userId);
-    }
-
-    /** ownUserId: 수정 중인 본인 id. 가입이면 null. 본인의 기존 이메일은 중복으로 보지 않는다. */
-    private void checkEmailAvailable(String email, Long ownUserId) {
-        if (email == null) {
-            return;
-        }
-        userRepository.findByEmail(email)
-                .filter(found -> !found.getId().equals(ownUserId))
-                .ifPresent(found -> {
-                    throw new DuplicateEmailException();
-                });
     }
 }

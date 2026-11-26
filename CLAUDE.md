@@ -10,7 +10,7 @@ Java 25, Spring Boot 4.1.1, Thymeleaf(SSR), Spring Data JPA, MySQL 8. 인증은 
 
 - 테스트: `./gradlew test` (**Docker가 켜져 있어야 한다.** Testcontainers가 MySQL 8 컨테이너를 띄운다)
 - CI와 같은 검사: `./gradlew checkstyleMain spotbugsMain test`
-- 실행: `./gradlew bootRun` (`src/main/resources/application-local.properties` 필요, `.example` 파일 참고)
+- 실행: `./gradlew bootRun` (`src/main/resources/application-local.properties` 필요, `.example` 파일 참고) (app.mail.enabled와 app.base-url이 없으면 앱이 시작되지 않는다. 로컬은 false와 http://localhost:8080)
 - JDK는 설치하지 않아도 된다. Gradle이 Java 25를 `~/.gradle/jdks`에 받는다.
 
 ## 프로필

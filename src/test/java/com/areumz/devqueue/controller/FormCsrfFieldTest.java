@@ -6,12 +6,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.areumz.devqueue.domain.Article;
 import com.areumz.devqueue.domain.Category;
+import com.areumz.devqueue.domain.EmailTokenType;
 import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.domain.Vocabulary;
 import com.areumz.devqueue.repository.ArticleRepository;
 import com.areumz.devqueue.repository.UserRepository;
 import com.areumz.devqueue.repository.VocabularyRepository;
+import com.areumz.devqueue.service.TokenService;
 import com.areumz.devqueue.support.IntegrationTest;
 import com.areumz.devqueue.support.TestAuth;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,9 @@ class FormCsrfFieldTest {
     @Autowired
     VocabularyRepository vocabularyRepository;
 
+    @Autowired
+    TokenService tokenService;
+
     User alice;
     Article article;
 
@@ -51,6 +56,17 @@ class FormCsrfFieldTest {
     @Test
     void loginFormHasCsrfFields() throws Exception {
         assertEveryFormHasCsrfField(html("/login", false));
+    }
+
+    @Test
+    void forgotPasswordFormHasCsrfFields() throws Exception {
+        assertEveryFormHasCsrfField(html("/forgot-password", false));
+    }
+
+    @Test
+    void resetPasswordFormHasCsrfFields() throws Exception {
+        String raw = tokenService.issue(alice.getId(), EmailTokenType.RESET_PASSWORD).orElseThrow();
+        assertEveryFormHasCsrfField(html("/reset-password?token=" + raw, false));
     }
 
     @Test
@@ -93,6 +109,15 @@ class FormCsrfFieldTest {
     @Test
     void withdrawFormHasCsrfFields() throws Exception {
         assertEveryFormHasCsrfField(html("/mypage/withdraw", true));
+    }
+
+    @Test
+    void mypageResendFormHasCsrfField() throws Exception {
+        User eve = userRepository.save(new User("eve", "hashed", "이브", Role.BACKEND, null, "eve@x.com"));
+        String html = mockMvc.perform(get("/mypage").with(TestAuth.loginAs(eve)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(html).contains("/mypage/verify-email");
+        assertEveryFormHasCsrfField(html);
     }
 
     private String html(String path, boolean login) throws Exception {

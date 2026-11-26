@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 주소에 토큰이 있는 페이지라서, 다른 사이트로 가는 요청에 주소(Referer)를 실어 보내지 않게 한다 -->
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="center-screen" style="display:flex; justify-content:center; padding-top:4rem;">
+    <div class="card" style="width:320px;">
+        <h2 style="margin-bottom:12px;" th:text="${title}"></h2>
+        <p style="font-size:14px; margin-bottom:16px;" th:text="${message}"></p>
+        <a th:href="@{/login}" class="btn-primary" style="display:block; text-align:center;">로그인으로 가기</a>
+    </div>
+</div>
+</body>
+</html>

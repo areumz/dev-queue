@@ -81,13 +81,14 @@ class MyPageTest {
     }
 
     @Test
-    void othersEmailIsRejectedAndNothingChanges() throws Exception {
-        update(alice, "새닉", "BACKEND", "BOB@x.com")
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("이미 사용 중인 이메일입니다.")));
+    void anotherAccountsUnverifiedEmailCanBeSaved() throws Exception {
+        update(alice, "새닉", "BACKEND", "BOB@x.com").andExpect(redirectedUrl("/mypage"));
+        em.flush();
+        em.clear();
         User saved = userRepository.findById(alice.getId()).orElseThrow();
-        assertThat(saved.getNickname()).isEqualTo("앨리스");
-        assertThat(saved.getEmail()).isEqualTo("alice@x.com");
+        assertThat(saved.getNickname()).isEqualTo("새닉");
+        assertThat(saved.getEmail()).isEqualTo("bob@x.com");
+        assertThat(saved.isEmailVerified()).isFalse();
     }
 
     @Test
