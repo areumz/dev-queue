@@ -4,3 +4,19 @@ spring.datasource.password=YOUR_MYSQL_PASSWORD
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+
+# 메일: 이 두 값은 기본값이 없어서 빠지면 앱이 시작되지 않는다.
+app.mail.enabled=false
+app.base-url=http://localhost:8080
+
+# app.mail.enabled=true일 때만 필요(운영). 비밀번호는 환경 변수로 넣고 저장소에 적지 않는다.
+# true이면 app.base-url은 https://로 시작해야 한다.
+#spring.mail.host=smtp.gmail.com
+#spring.mail.port=587
+#spring.mail.username=
+#spring.mail.password=
+#spring.mail.properties.mail.smtp.auth=true
+#spring.mail.properties.mail.smtp.starttls.enable=true
+#spring.mail.properties.mail.smtp.connectiontimeout=5000
+#spring.mail.properties.mail.smtp.timeout=5000
+#spring.mail.properties.mail.smtp.writetimeout=5000
