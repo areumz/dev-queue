@@ -79,12 +79,12 @@ public class EmailToken {
         return createdAt;
     }
 
-    /** 아직 안 썼고 만료 전이다. */
+    /** 미사용 & 만료 전 */
     public boolean isUsable(LocalDateTime now) {
         return usedAt == null && expiresAt.isAfter(now);
     }
 
-    /** 아직 안 썼다(만료 여부는 상관없다). */
+    /** 미사용 (만료 여부는 상관x). */
     public boolean isOpen() {
         return usedAt == null;
     }

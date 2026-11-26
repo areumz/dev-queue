@@ -19,7 +19,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class AsyncConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(AsyncConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncConfig.class);
 
     @Bean(name = "mailExecutor")
     @Profile("!test | async-real")
@@ -34,7 +34,7 @@ public class AsyncConfig {
     }
 
     /**
-     * 스레드 threads개, 대기 큐 queueCapacity칸. 가득 차면 요청을 버리고 경고만 남긴다(메일 폭탄이 서버 자원을 먹지 않게).
+     * 스레드 threads개, 대기 큐 queueCapacity칸. 가득 차면 요청을 버리고 경고만 남김
      * 초기화하지 않은 채로 돌려준다. 빈으로 쓰면 Spring이 초기화하고, 테스트는 직접 initialize()를 부른다.
      */
     public static ThreadPoolTaskExecutor newMailExecutor(int threads, int queueCapacity) {
@@ -43,7 +43,7 @@ public class AsyncConfig {
         executor.setMaxPoolSize(threads);
         executor.setQueueCapacity(queueCapacity);
         executor.setThreadNamePrefix("mail-");
-        executor.setRejectedExecutionHandler((task, pool) -> log.warn("mail queue is full, request dropped"));
+        executor.setRejectedExecutionHandler((task, pool) -> LOG.warn("mail queue is full, request dropped"));
         return executor;
     }
 }

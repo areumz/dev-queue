@@ -91,7 +91,7 @@ public class User {
         this.lastPopupDate = date;
     }
 
-    /** 이메일이 바뀌었으면 true를 돌려준다. 그때는 인증 상태도 되돌린다(새 이메일은 아직 인증 전이다). */
+    /** 이메일이 바뀌었으면 true return. 그때는 인증 상태도 되돌림(새 이메일은 아직 인증 전 상태). */
     public boolean updateProfile(String nickname, Role role, String roleDetail, String email) {
         boolean emailChanged = !Objects.equals(this.email, email);
         this.nickname = nickname;

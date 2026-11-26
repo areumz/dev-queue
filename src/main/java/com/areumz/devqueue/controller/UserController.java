@@ -51,7 +51,7 @@ public class UserController {
             bindingResult.rejectValue("username", "duplicate", e.getMessage());
             return "signup";
         }
-        // 메일이 실패해도 가입은 이미 성공했다. 결과를 안내 문구에 덧붙인다.
+        // 메일이 실패해도 가입은 이미 성공. 결과를 안내 문구에 덧붙인다.
         SendResult sent = emailVerificationService.sendVerification(saved.getId());
         String message = "회원가입이 완료되었습니다.";
         if (sent != SendResult.SKIPPED) {

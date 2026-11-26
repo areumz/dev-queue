@@ -252,8 +252,10 @@ class EmailVerificationTest {
         verificationService.sendVerification(alice.getId());
         String token = lastToken();
 
-        saveProfile(alice, "").andExpect(redirectedUrl("/mypage"));
+        // updateProfile 자체가 열린 토큰을 무효화하는지 확인한다
+        userService.updateProfile(alice.getId(), "앨리스", Role.BACKEND, null, "");
 
+        assertThat(tokenService.findValid(token, EmailTokenType.VERIFY_EMAIL)).isEmpty();
         verifyLink(token).andExpect(content().string(containsString(INVALID)));
     }
 

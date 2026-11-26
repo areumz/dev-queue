@@ -68,7 +68,7 @@ public class MyPageController {
 
         String message = "정보를 저장했어요.";
         if (emailChanged) {
-            SendResult sent = emailVerificationService.sendAfterEmailChange(loginUser.getId());
+            SendResult sent = emailVerificationService.sendVerification(loginUser.getId());
             if (sent != SendResult.SKIPPED) {
                 message += " " + VerificationMessages.of(sent);
             }

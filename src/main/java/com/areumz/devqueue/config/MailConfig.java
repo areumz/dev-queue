@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 
 /**
- * 어떤 발송기를 쓸지 정한다. app.mail.enabled와 app.base-url은 기본값이 없다.
- * 없거나 잘못되면 앱이 시작되지 않는다: 운영에서 설정을 빠뜨렸을 때 조용히 로그 발송으로 돌아가
- * 재설정 링크(토큰)가 로그에 남는 일을 막기 위해서다.
+ * 발송기 선택. (app.mail.enabled, app.base-url은 기본값 x)
+ * 없거나 잘못되면 앱이 시작되지 않음: 운영에서 설정을 빠뜨렸을 때 로그 발송으로 돌아가
+ * 재설정 링크(토큰)가 로그에 남는 일을 막기 위함
  */
 @Configuration
 public class MailConfig {

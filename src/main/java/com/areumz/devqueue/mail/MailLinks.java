@@ -3,7 +3,7 @@ package com.areumz.devqueue.mail;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/** 메일에 넣을 링크를 만든다. 주소는 app.base-url 설정(기본값 없음)에서 온다. */
+/** 메일에 넣을 링크 생성. 주소는 app.base-url 설정(기본값 없음)에서 옴. */
 @Component
 public class MailLinks {
 

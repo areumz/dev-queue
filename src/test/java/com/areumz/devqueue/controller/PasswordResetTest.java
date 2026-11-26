@@ -20,6 +20,7 @@ import com.areumz.devqueue.repository.EmailTokenRepository;
 import com.areumz.devqueue.repository.UserRepository;
 import com.areumz.devqueue.service.PasswordResetService;
 import com.areumz.devqueue.service.TokenService;
+import com.areumz.devqueue.service.UserService;
 import com.areumz.devqueue.support.IntegrationTest;
 import com.areumz.devqueue.support.RecordingMailSender;
 import jakarta.persistence.EntityManager;
@@ -50,6 +51,9 @@ class PasswordResetTest {
 
     @Autowired
     TokenService tokenService;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     EmailTokenRepository tokenRepository;
@@ -284,6 +288,26 @@ class PasswordResetTest {
         assertThat(afterUse).isEqualTo(unknown);
     }
 
+    // ---- 다른 경로가 열린 재설정 링크를 죽인다 ----
+
+    @Test
+    void changingThePasswordKillsOpenResetLinks() throws Exception {
+        String token = resetTokenFor(alice);
+
+        userService.changePassword(alice.getId(), "oldpassword1", "changed12345");
+
+        assertThat(tokenService.findValid(token, EmailTokenType.RESET_PASSWORD)).isEmpty();
+    }
+
+    @Test
+    void changingTheEmailKillsOpenResetLinks() throws Exception {
+        String token = resetTokenFor(alice);
+
+        userService.updateProfile(alice.getId(), "앨리스", Role.BACKEND, null, "new@x.com");
+
+        assertThat(tokenService.findValid(token, EmailTokenType.RESET_PASSWORD)).isEmpty();
+    }
+
     // ---- 보안 ----
 
     @Test
@@ -294,7 +318,7 @@ class PasswordResetTest {
     }
 
     @Test
-    void exactlyThreePathsAreOpenWithoutLogin() throws Exception {
+    void newPathsAreOpenAndOthersStillNeedLogin() throws Exception {
         mockMvc.perform(get("/forgot-password")).andExpect(status().isOk());
         mockMvc.perform(get("/reset-password")).andExpect(status().isOk());
         mockMvc.perform(get("/verify-email")).andExpect(status().isOk());

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PasswordResetService {
 
-    private static final Logger log = LoggerFactory.getLogger(PasswordResetService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PasswordResetService.class);
     private static final String SUBJECT = "[DevQueue] 비밀번호 재설정";
 
     private final UserRepository userRepository;
@@ -43,18 +43,15 @@ public class PasswordResetService {
      * 비동기 안의 예외는 호출한 쪽에 전달되지 않으므로 여기서 잡아 클래스 이름만 로그로 남긴다.
      * 토큰과 이메일은 로그에 남기지 않는다.
      */
-    @Async("mailExecutor")
+    // 별도 스레드에서 비동기로 실행 (스레드 2, 대기열 100)
+    @Async("mailExecutor") 
     public void requestReset(String rawEmail) {
         try {
-            String email = UserService.normalizeEmail(rawEmail);
-            if (email == null) {
-                return;
-            }
-            List<User> owners = userRepository.findVerifiedByEmail(email);
+            List<User> owners = userRepository.findVerifiedByEmail(rawEmail);
             if (owners.size() != 1) {
-                // 0명이면 조용히 무시. 2명 이상은 동시에 같은 이메일을 인증한 드문 경우라 누구에게도 보내지 않는다.
+                // 0명이면 무시. 2명 이상은 동시에 같은 이메일을 인증한 드문 경우라 누구에게도 보내지 않음
                 if (owners.size() > 1) {
-                    log.warn("password reset skipped: one verified email belongs to {} accounts", owners.size());
+                    LOG.warn("password reset skipped: one verified email belongs to {} accounts", owners.size());
                 }
                 return;
             }
@@ -62,9 +59,9 @@ public class PasswordResetService {
             if (rawToken.isEmpty()) {
                 return;
             }
-            mailSender.send(email, SUBJECT, body(rawToken.get()));
+            mailSender.send(rawEmail, SUBJECT, body(rawToken.get()));
         } catch (RuntimeException e) {
-            log.warn("password reset mail failed: {}", e.getClass().getSimpleName());
+            LOG.warn("password reset mail failed: {}", e.getClass().getSimpleName());
         }
     }
 
@@ -72,7 +69,7 @@ public class PasswordResetService {
         return tokenService.findValid(rawToken, EmailTokenType.RESET_PASSWORD).isPresent();
     }
 
-    /** 토큰을 확인하고 비밀번호를 바꾼다. 성공하면 그 사용자의 열린 토큰을 모두(방금 쓴 것 포함) 무효로 만든다. */
+    /** 토큰을 확인하고 비밀번호 변경. 성공하면 그 사용자의 열린 토큰을 모두(방금 쓴 것 포함) 무효로 만듦. */
     @Transactional
     public void resetPassword(String rawToken, String newPassword) {
         EmailToken token = tokenService.findValid(rawToken, EmailTokenType.RESET_PASSWORD)

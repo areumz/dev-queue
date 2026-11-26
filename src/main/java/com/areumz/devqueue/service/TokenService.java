@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 인증·비밀번호 재설정이 같이 쓰는 1회용 토큰. 원본은 메일 링크에만 있고 DB에는 해시만 저장한다. */
+/** 인증, 비밀번호 재설정이 같이 쓰는 1회용 토큰. 원본은 메일 링크에만 있고 DB에는 해시만 저장. */
 @Service
 public class TokenService {
 
@@ -33,7 +33,7 @@ public class TokenService {
         this.clock = clock;
     }
 
-    /** 토큰 원본의 SHA-256 해시(hex 64자). 같은 입력은 항상 같은 값이라 조회에 쓴다. */
+    /** 토큰 원본의 SHA-256 해시(hex 64자). 같은 입력은 항상 같은 값이라 조회에 사용. */
     public static String hash(String rawToken) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -44,8 +44,8 @@ public class TokenService {
     }
 
     /**
-     * 새 토큰을 만들고 원본을 돌려준다. 같은 사용자·같은 종류가 1시간에 3번을 넘으면 빈 값.
-     * 제한 확인이 먼저다: 제한에 걸린 요청이 사용자의 유효한 링크를 무효로 만들면 안 된다.
+     * 새 토큰 생성 후 원본 return. 같은 사용자·같은 종류가 1시간에 3번을 넘으면 빈 값.
+     * 제한 확인이 먼저: 제한에 걸린 요청이 사용자의 유효한 링크를 무효로 만들면 안 됨.
      */
     @Transactional
     public Optional<String> issue(Long userId, EmailTokenType type) {
@@ -78,7 +78,7 @@ public class TokenService {
         tokenRepository.save(token);
     }
 
-    /** 그 사용자의 안 쓴 토큰 중 해당 종류만 무효로 만든다. */
+    /** 그 사용자의 안 쓴 토큰 중 해당 종류만 무효로 만듦. */
     @Transactional
     public void invalidateOpen(Long userId, EmailTokenType type) {
         LocalDateTime now = LocalDateTime.now(clock);
@@ -90,7 +90,7 @@ public class TokenService {
         }
     }
 
-    /** 그 사용자의 안 쓴 토큰을 종류와 상관없이 모두 무효로 만든다. */
+    /** 그 사용자의 안 쓴 토큰을 종류와 상관없이 모두 무효로 만듦. */
     @Transactional
     public void invalidateAllOpen(Long userId) {
         LocalDateTime now = LocalDateTime.now(clock);

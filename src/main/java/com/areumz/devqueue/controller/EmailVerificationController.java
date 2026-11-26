@@ -22,7 +22,7 @@ public class EmailVerificationController {
         this.verificationService = verificationService;
     }
 
-    /** 로그인 없이 열린다(메일 앱에서 누르면 로그인이 풀린 브라우저가 열리는 경우가 많다). 토큰이 없어도 같은 안내를 보여준다. */
+    /** 로그인 없이 열림(메일 앱에서 누르면 로그인이 풀린 브라우저가 열리는 경우가 많음). 토큰이 없어도 같은 안내를 보여줌. */
     @GetMapping("/verify-email")
     public String verify(@RequestParam(defaultValue = "") String token, Model model) {
         try {

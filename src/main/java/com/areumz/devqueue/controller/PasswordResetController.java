@@ -26,7 +26,7 @@ public class PasswordResetController {
         return "forgotPassword";
     }
 
-    /** 처리는 다른 스레드에서 하고 바로 같은 화면을 보여준다. 이메일을 화면에 되돌려 보여주지 않는다. */
+    /** 처리는 다른 스레드에서 하고 바로 같은 화면을 보여줌. 이메일을 화면에 되돌려 보여주지 않는다. */
     @PostMapping("/forgot-password")
     public String forgot(@Valid @ModelAttribute("forgotPasswordForm") ForgotPasswordForm form,
                          BindingResult bindingResult) {
@@ -52,7 +52,11 @@ public class PasswordResetController {
     public String reset(@Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm form,
                         BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            return "resetPassword";   // 토큰은 숨은 필드에 그대로 남아 있다
+            /**
+             * 토큰은 숨은 필드에 그대로 남아 있음
+             * 즉, 비밀번호 오류로 화면을 다시 표시하더라도 사용자가 메일 링크를 다시 클릭할 필요 없음
+             */
+            return "resetPassword";   
         }
         try {
             passwordResetService.resetPassword(form.getToken(), form.getNewPassword());
