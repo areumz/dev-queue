@@ -95,6 +95,15 @@ class FormCsrfFieldTest {
         assertEveryFormHasCsrfField(html("/mypage/withdraw", true));
     }
 
+    @Test
+    void mypageResendFormHasCsrfField() throws Exception {
+        User eve = userRepository.save(new User("eve", "hashed", "이브", Role.BACKEND, null, "eve@x.com"));
+        String html = mockMvc.perform(get("/mypage").with(TestAuth.loginAs(eve)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(html).contains("/mypage/verify-email");
+        assertEveryFormHasCsrfField(html);
+    }
+
     private String html(String path, boolean login) throws Exception {
         var request = get(path);
         if (login) {

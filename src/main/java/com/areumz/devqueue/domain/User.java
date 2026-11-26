@@ -2,6 +2,7 @@ package com.areumz.devqueue.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class User {
@@ -21,6 +22,8 @@ public class User {
     private String roleDetail;
 
     private String email;
+
+    private boolean emailVerified;
 
     protected User() {
     }
@@ -72,6 +75,14 @@ public class User {
         return email;
     }
 
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
+    }
+
     public LocalDate getLastPopupDate() {
         return lastPopupDate;
     }
@@ -80,11 +91,17 @@ public class User {
         this.lastPopupDate = date;
     }
 
-    public void updateProfile(String nickname, Role role, String roleDetail, String email) {
+    /** 이메일이 바뀌었으면 true를 돌려준다. 그때는 인증 상태도 되돌린다(새 이메일은 아직 인증 전이다). */
+    public boolean updateProfile(String nickname, Role role, String roleDetail, String email) {
+        boolean emailChanged = !Objects.equals(this.email, email);
         this.nickname = nickname;
         this.role = role;
         this.roleDetail = roleDetail;
         this.email = email;
+        if (emailChanged) {
+            this.emailVerified = false;
+        }
+        return emailChanged;
     }
 
     public void changePassword(String encodedPassword) {

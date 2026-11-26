@@ -1,8 +1,10 @@
 package com.areumz.devqueue.controller;
 
 import com.areumz.devqueue.domain.Role;
-import com.areumz.devqueue.exception.DuplicateEmailException;
+import com.areumz.devqueue.domain.User;
 import com.areumz.devqueue.exception.DuplicateUsernameException;
+import com.areumz.devqueue.service.EmailVerificationService;
+import com.areumz.devqueue.service.EmailVerificationService.SendResult;
 import com.areumz.devqueue.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -16,9 +18,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class UserController {
     private final UserService userService;
+    private final EmailVerificationService emailVerificationService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, EmailVerificationService emailVerificationService) {
         this.userService = userService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @ModelAttribute("roles")
@@ -39,17 +43,21 @@ public class UserController {
             return "signup";
         }
 
+        User saved;
         try {
-            userService.signup(form.getUsername(), form.getPassword(), form.getNickname(),
+            saved = userService.signup(form.getUsername(), form.getPassword(), form.getNickname(),
                     form.getRole(), form.getRoleDetail(), form.getEmail());
         } catch (DuplicateUsernameException e) {
             bindingResult.rejectValue("username", "duplicate", e.getMessage());
             return "signup";
-        } catch (DuplicateEmailException e) {
-            bindingResult.rejectValue("email", "duplicate", e.getMessage());
-            return "signup";
         }
-        redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다. 로그인해주세요!");
+        // 메일이 실패해도 가입은 이미 성공했다. 결과를 안내 문구에 덧붙인다.
+        SendResult sent = emailVerificationService.sendVerification(saved.getId());
+        String message = "회원가입이 완료되었습니다.";
+        if (sent != SendResult.SKIPPED) {
+            message += " " + VerificationMessages.of(sent);
+        }
+        redirectAttributes.addFlashAttribute("message", message + " 로그인해주세요!");
         return "redirect:/login";
     }
 

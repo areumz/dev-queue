@@ -16,4 +16,7 @@ public interface EmailTokenRepository {
 
     /** since 이후에 만들어진 토큰 수(썼든 안 썼든 센다). */
     long countCreatedSince(Long userId, EmailTokenType type, LocalDateTime since);
+
+    /** 탈퇴할 때 그 사용자의 토큰을 모두 지운다. */
+    void deleteByUserId(Long userId);
 }

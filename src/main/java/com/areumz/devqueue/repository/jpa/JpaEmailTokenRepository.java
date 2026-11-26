@@ -37,4 +37,9 @@ public class JpaEmailTokenRepository implements EmailTokenRepository {
     public long countCreatedSince(Long userId, EmailTokenType type, LocalDateTime since) {
         return springDataJpaEmailTokenRepository.countByUserIdAndTypeAndCreatedAtAfter(userId, type, since);
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        springDataJpaEmailTokenRepository.deleteByUserId(userId);
+    }
 }

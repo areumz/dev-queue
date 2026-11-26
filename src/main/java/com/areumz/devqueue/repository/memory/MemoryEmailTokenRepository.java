@@ -48,4 +48,9 @@ public class MemoryEmailTokenRepository implements EmailTokenRepository {
                         && token.getCreatedAt().isAfter(since))
                 .count();
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        tokens.values().removeIf(token -> token.getUserId().equals(userId));
+    }
 }

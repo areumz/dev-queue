@@ -33,8 +33,8 @@ public class JpaUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return springDataJpaUserRepository.findByEmail(email);
+    public List<User> findVerifiedByEmail(String email) {
+        return springDataJpaUserRepository.findByEmailAndEmailVerifiedTrue(email);
     }
 
     @Override

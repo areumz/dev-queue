@@ -99,4 +99,10 @@ public class TokenService {
             tokenRepository.save(token);
         }
     }
+
+    /** 탈퇴할 때 그 사용자의 토큰(해시)을 모두 지운다. */
+    @Transactional
+    public void deleteAllOf(Long userId) {
+        tokenRepository.deleteByUserId(userId);
+    }
 }

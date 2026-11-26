@@ -13,4 +13,6 @@ public interface SpringDataJpaEmailTokenRepository extends JpaRepository<EmailTo
     List<EmailToken> findByUserIdAndUsedAtIsNull(Long userId);
 
     long countByUserIdAndTypeAndCreatedAtAfter(Long userId, EmailTokenType type, LocalDateTime since);
+
+    void deleteByUserId(Long userId);
 }

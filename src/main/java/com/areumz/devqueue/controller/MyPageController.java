@@ -4,8 +4,9 @@ import com.areumz.devqueue.auth.LoginUser;
 import com.areumz.devqueue.auth.LoginUserRefresher;
 import com.areumz.devqueue.domain.Role;
 import com.areumz.devqueue.domain.User;
-import com.areumz.devqueue.exception.DuplicateEmailException;
 import com.areumz.devqueue.exception.WrongPasswordException;
+import com.areumz.devqueue.service.EmailVerificationService;
+import com.areumz.devqueue.service.EmailVerificationService.SendResult;
 import com.areumz.devqueue.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,9 +30,13 @@ public class MyPageController {
 
     private final LoginUserRefresher loginUserRefresher;
 
-    public MyPageController(UserService userService, LoginUserRefresher loginUserRefresher) {
+    private final EmailVerificationService emailVerificationService;
+
+    public MyPageController(UserService userService, LoginUserRefresher loginUserRefresher,
+                            EmailVerificationService emailVerificationService) {
         this.userService = userService;
         this.loginUserRefresher = loginUserRefresher;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @ModelAttribute("roles")
@@ -43,8 +48,7 @@ public class MyPageController {
     public String form(Model model, @AuthenticationPrincipal LoginUser loginUser) {
         User user = userService.getUser(loginUser.getId());
         model.addAttribute("myPageForm", MyPageForm.from(user));
-        model.addAttribute("loginUser", loginUser);
-        model.addAttribute("username", user.getUsername());
+        addCommon(model, loginUser, user);
         return "mypage";
     }
 
@@ -54,22 +58,30 @@ public class MyPageController {
                          @AuthenticationPrincipal LoginUser loginUser,
                          RedirectAttributes redirectAttributes,
                          HttpServletRequest request, HttpServletResponse response) {
-        model.addAttribute("loginUser", loginUser);
-        model.addAttribute("username", loginUser.getUsername());
+        addCommon(model, loginUser, userService.getUser(loginUser.getId()));
         if (bindingResult.hasErrors()) {
             return "mypage";
         }
-        User saved;
-        try {
-            saved = userService.updateProfile(loginUser.getId(), form.getNickname(), form.getRole(),
-                    form.getRoleDetail(), form.getEmail());
-        } catch (DuplicateEmailException e) {
-            bindingResult.rejectValue("email", "duplicate", e.getMessage());
-            return "mypage";
+        boolean emailChanged = userService.updateProfile(loginUser.getId(), form.getNickname(),
+                form.getRole(), form.getRoleDetail(), form.getEmail());
+        loginUserRefresher.refresh(userService.getUser(loginUser.getId()), request, response);
+
+        String message = "정보를 저장했어요.";
+        if (emailChanged) {
+            SendResult sent = emailVerificationService.sendAfterEmailChange(loginUser.getId());
+            if (sent != SendResult.SKIPPED) {
+                message += " " + VerificationMessages.of(sent);
+            }
         }
-        loginUserRefresher.refresh(saved, request, response);
-        redirectAttributes.addFlashAttribute("message", "정보를 저장했어요.");
+        redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/mypage";
+    }
+
+    private void addCommon(Model model, LoginUser loginUser, User user) {
+        model.addAttribute("loginUser", loginUser);
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("hasEmail", user.getEmail() != null);
+        model.addAttribute("emailVerified", user.isEmailVerified());
     }
 
     @GetMapping("/mypage/password")

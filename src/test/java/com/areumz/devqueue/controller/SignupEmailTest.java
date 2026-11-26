@@ -51,12 +51,12 @@ class SignupEmailTest {
     }
 
     @Test
-    void duplicateEmailIgnoringCaseAndSpacesIsRejected() throws Exception {
+    void sameEmailCanBeSavedByManyAccountsUntilItIsVerified() throws Exception {
         userService.signup("alice", "password123", "앨리스", Role.BACKEND, null, "a@x.com");
-        signup("bob", "password123", " A@X.com ")
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("이미 사용 중인 이메일입니다.")));
-        assertThat(userRepository.findByUsername("bob")).isEmpty();
+
+        signup("bob", "password123", " A@X.com ").andExpect(redirectedUrl("/login"));
+
+        assertThat(userRepository.findByUsername("bob").orElseThrow().getEmail()).isEqualTo("a@x.com");
     }
 
     @Test
